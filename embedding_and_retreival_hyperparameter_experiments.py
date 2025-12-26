@@ -530,12 +530,12 @@ def score_matches(matches, eq: EvalQuery) -> float:
     # fallback: mean similarity score (relative comparisons only)
     return sum(float(m.score) for m in matches) / len(matches)
 
-def evaluate_grid(index, embedding_client: OpenAI, chat_client: OpenAI, schemes: List[ChunkScheme], topk_grid: List[int], eval_set: List[EvalQuery]) -> List[Dict]:
+def evaluate_grid(index, embedding_client: OpenAI, schemes: List[ChunkScheme], topk_grid: List[int], eval_set: List[EvalQuery]) -> List[Dict]:
     """
     Evaluate all configurations and save detailed results to text files.
     
     For each configuration, creates a file like 'eval_cs512_ol20_topk5.txt'
-    containing queries, retrieved context, similarity scores, and LLM responses.
+    containing queries, retrieved context, and similarity scores.
     """
     results: List[Dict] = []
     total_configs = len(schemes) * len(topk_grid)
@@ -567,20 +567,14 @@ def evaluate_grid(index, embedding_client: OpenAI, chat_client: OpenAI, schemes:
                 f.write("=" * 80 + "\n\n")
                 
                 for i, eq in enumerate(eval_set, 1):
-                    # Use rag_answer to get full results
+                    # Retrieval only - no LLM
                     try:
-                        rag_result = rag_answer(embedding_client, chat_client, index, scheme.scheme_id, top_k, eq.question)
-                        answer = rag_result["response"]
-                        context = rag_result["context"]
-                        
-                        # Score the retrieval quality
                         matches = query_index(index, scheme.scheme_id, embedding_client, eq.question, top_k)
                         score = score_matches(matches, eq)
                         scores.append(score)
                         
                     except Exception as e:
-                        answer = f"[ERROR: {e}]"
-                        context = []
+                        matches = []
                         score = 0.0
                         scores.append(score)
                     
@@ -600,17 +594,13 @@ def evaluate_grid(index, embedding_client: OpenAI, chat_client: OpenAI, schemes:
                     f.write("RETRIEVED CONTEXT:\n")
                     f.write(f"{'-' * 80}\n\n")
                     
-                    for j, ctx in enumerate(context, 1):
-                        f.write(f"[{j}] Similarity: {ctx.get('score', 0):.4f}\n")
-                        f.write(f"    Talk ID: {ctx.get('talk_id')}\n")
-                        f.write(f"    Title: {ctx.get('title')}\n")
-                        chunk_text = ctx.get('chunk', '')
+                    for j, m in enumerate(matches, 1):
+                        md = m.metadata or {}
+                        f.write(f"[{j}] Similarity: {float(m.score):.4f}\n")
+                        f.write(f"    Talk ID: {md.get('talk_id')}\n")
+                        f.write(f"    Title: {md.get('title')}\n")
+                        chunk_text = md.get('chunk', '')
                         f.write(f"    Chunk: {chunk_text[:200]}...\n\n")
-                    
-                    f.write(f"{'-' * 80}\n")
-                    f.write("LLM RESPONSE:\n")
-                    f.write(f"{'-' * 80}\n\n")
-                    f.write(f"{answer}\n\n")
             
             mean_score = sum(scores) / max(1, len(scores))
             results.append(
@@ -905,7 +895,7 @@ def main():
 
     # 3) Retrieval-only grid evaluation
     print("\n=== Grid Search Evaluation ===")
-    results = evaluate_grid(index, embedding_client, chat_client, schemes, topk_grid, eval_set)
+    results = evaluate_grid(index, embedding_client, schemes, topk_grid, eval_set)
     
     print("\n=== Top 5 Configurations ===")
     for i, config in enumerate(results[:5], 1):
