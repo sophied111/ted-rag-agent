@@ -484,8 +484,15 @@ def evaluate_grid(index, embedding_client: OpenAI, chat_client: OpenAI, schemes:
     total_configs = len(schemes) * len(topk_grid)
     config_num = 0
     
-    # Create output directory for evaluation results
-    os.makedirs("evaluation_results", exist_ok=True)
+    # Create output directory with timestamp if it exists
+    if os.path.exists("evaluation_results"):
+        timestamp = time.strftime("%Y%m%d_%H%M%S")
+        output_dir = f"evaluation_results_{timestamp}"
+        print(f"Note: 'evaluation_results' folder exists, using '{output_dir}' instead\n")
+    else:
+        output_dir = "evaluation_results"
+    
+    os.makedirs(output_dir, exist_ok=True)
     
     for scheme in schemes:
         for top_k in topk_grid:
@@ -493,7 +500,7 @@ def evaluate_grid(index, embedding_client: OpenAI, chat_client: OpenAI, schemes:
             scores = []
             
             # Prepare detailed output file
-            output_file = f"evaluation_results/eval_{scheme.scheme_id}_topk{top_k}.txt"
+            output_file = f"{output_dir}/eval_{scheme.scheme_id}_topk{top_k}.txt"
             
             with open(output_file, "w", encoding="utf-8") as f:
                 f.write("=" * 80 + "\n")
@@ -506,25 +513,22 @@ def evaluate_grid(index, embedding_client: OpenAI, chat_client: OpenAI, schemes:
                 f.write("=" * 80 + "\n\n")
                 
                 for i, eq in enumerate(eval_set, 1):
-                    # Get retrieval results and generate answer
-                    matches = query_index(index, scheme.scheme_id, embedding_client, eq.question, top_k)
-                    score = score_matches(matches, eq)
-                    scores.append(score)
-                    
-                    # Generate full RAG answer
-                    user_prompt = build_prompt(eq.question, matches)
-                    
+                    # Use rag_answer to get full results
                     try:
-                        chat_response = chat_client.chat.completions.create(
-                            model=CHAT_MODEL,
-                            messages=[
-                                {"role": "system", "content": SYSTEM_PROMPT},
-                                {"role": "user", "content": user_prompt},
-                            ],
-                        )
-                        answer = chat_response.choices[0].message.content
+                        rag_result = rag_answer(embedding_client, chat_client, index, scheme.scheme_id, top_k, eq.question)
+                        answer = rag_result["response"]
+                        context = rag_result["context"]
+                        
+                        # Score the retrieval quality (need matches for scoring)
+                        matches = query_index(index, scheme.scheme_id, embedding_client, eq.question, top_k)
+                        score = score_matches(matches, eq)
+                        scores.append(score)
+                        
                     except Exception as e:
-                        answer = f"[ERROR generating answer: {e}]"
+                        answer = f"[ERROR: {e}]"
+                        context = []
+                        score = 0.0
+                        scores.append(score)
                     
                     # Write detailed results
                     f.write(f"\n{'=' * 80}\n")
@@ -542,14 +546,12 @@ def evaluate_grid(index, embedding_client: OpenAI, chat_client: OpenAI, schemes:
                     f.write("RETRIEVED CONTEXT:\n")
                     f.write(f"{'-' * 80}\n\n")
                     
-                    for j, m in enumerate(matches, 1):
-                        md = m.metadata or {}
-                        f.write(f"[{j}] Similarity: {m.score:.4f}\n")
-                        f.write(f"    Talk ID: {md.get('talk_id')}\n")
-                        f.write(f"    Title: {md.get('title')}\n")
-                        f.write(f"    Speaker: {md.get('speaker_1')}\n")
-                        f.write(f"    Topics: {md.get('topics')}\n")
-                        f.write(f"    Chunk: {md.get('chunk', '')[:200]}...\n\n")
+                    for j, ctx in enumerate(context, 1):
+                        f.write(f"[{j}] Similarity: {ctx.get('score', 0):.4f}\n")
+                        f.write(f"    Talk ID: {ctx.get('talk_id')}\n")
+                        f.write(f"    Title: {ctx.get('title')}\n")
+                        chunk_text = ctx.get('chunk', '')
+                        f.write(f"    Chunk: {chunk_text[:200]}...\n\n")
                     
                     f.write(f"{'-' * 80}\n")
                     f.write("LLM RESPONSE:\n")
@@ -634,6 +636,7 @@ def rag_answer(embedding_client: OpenAI, chat_client: OpenAI, index, scheme_id: 
 def build_and_upsert_all_schemes(index, embedding_client: OpenAI, df: pd.DataFrame, schemes: List[ChunkScheme]) -> None:
     """
     Build chunks for all schemes and upload to Pinecone.
+    Skips namespaces that already have vectors to avoid re-embedding.
     
     Args:
         index: Pinecone index instance
@@ -643,6 +646,17 @@ def build_and_upsert_all_schemes(index, embedding_client: OpenAI, df: pd.DataFra
     """
     for i, scheme in enumerate(schemes, 1):
         print(f"[{i}/{len(schemes)}] Processing scheme: {scheme.scheme_id}")
+        
+        # Check if namespace already has vectors
+        try:
+            stats = index.describe_index_stats()
+            namespace_stats = stats.get('namespaces', {})
+            if scheme.scheme_id in namespace_stats and namespace_stats[scheme.scheme_id].get('vector_count', 0) > 0:
+                print(f"  ⏭️  Namespace '{scheme.scheme_id}' already has {namespace_stats[scheme.scheme_id]['vector_count']} vectors, skipping")
+                continue
+        except Exception as e:
+            print(f"  Warning: Could not check namespace stats: {e}")
+        
         chunks = build_chunks_for_scheme(df, scheme, store_chunk_text_in_metadata=True)
         print(f"  Created {len(chunks)} chunks, uploading to Pinecone...")
         upsert_chunks(index, scheme.scheme_id, embedding_client, chunks)
