@@ -473,90 +473,18 @@ def score_matches(matches, eq: EvalQuery) -> float:
     # fallback: mean similarity score (relative comparisons only)
     return sum(float(m.score) for m in matches) / len(matches)
 
-def evaluate_grid(index, embedding_client: OpenAI, chat_client: OpenAI, schemes: List[ChunkScheme], topk_grid: List[int], eval_set: List[EvalQuery]) -> List[Dict]:
-    """
-    Evaluate all configurations and save detailed results to text files.
-    
-    For each configuration, creates a file like 'eval_cs512_ol20_topk5.txt'
-    containing queries, retrieved context, and LLM responses.
-    """
+def evaluate_grid(index, embedding_client: OpenAI, schemes: List[ChunkScheme], topk_grid: List[int], eval_set: List[EvalQuery]) -> List[Dict]:
     results: List[Dict] = []
     total_configs = len(schemes) * len(topk_grid)
     config_num = 0
-    
-    # Create output directory with timestamp if it exists
-    if os.path.exists("evaluation_results"):
-        timestamp = time.strftime("%Y%m%d_%H%M%S")
-        output_dir = f"evaluation_results_{timestamp}"
-        print(f"Note: 'evaluation_results' folder exists, using '{output_dir}' instead\n")
-    else:
-        output_dir = "evaluation_results"
-    
-    os.makedirs(output_dir, exist_ok=True)
     
     for scheme in schemes:
         for top_k in topk_grid:
             config_num += 1
             scores = []
-            
-            # Prepare detailed output file
-            output_file = f"{output_dir}/eval_{scheme.scheme_id}_topk{top_k}.txt"
-            
-            with open(output_file, "w", encoding="utf-8") as f:
-                f.write("=" * 80 + "\n")
-                f.write(f"EVALUATION RESULTS - Configuration {config_num}/{total_configs}\n")
-                f.write("=" * 80 + "\n")
-                f.write(f"Scheme ID: {scheme.scheme_id}\n")
-                f.write(f"Chunk Size: {scheme.chunk_tokens} tokens\n")
-                f.write(f"Overlap Ratio: {scheme.overlap_ratio}\n")
-                f.write(f"Top-K: {top_k}\n")
-                f.write("=" * 80 + "\n\n")
-                
-                for i, eq in enumerate(eval_set, 1):
-                    # Use rag_answer to get full results
-                    try:
-                        rag_result = rag_answer(embedding_client, chat_client, index, scheme.scheme_id, top_k, eq.question)
-                        answer = rag_result["response"]
-                        context = rag_result["context"]
-                        
-                        # Score the retrieval quality (need matches for scoring)
-                        matches = query_index(index, scheme.scheme_id, embedding_client, eq.question, top_k)
-                        score = score_matches(matches, eq)
-                        scores.append(score)
-                        
-                    except Exception as e:
-                        answer = f"[ERROR: {e}]"
-                        context = []
-                        score = 0.0
-                        scores.append(score)
-                    
-                    # Write detailed results
-                    f.write(f"\n{'=' * 80}\n")
-                    f.write(f"QUERY {i}/{len(eval_set)}\n")
-                    f.write(f"{'=' * 80}\n\n")
-                    f.write(f"Question: {eq.question}\n\n")
-                    
-                    if eq.expected_talk_id:
-                        f.write(f"Expected Talk ID: {eq.expected_talk_id}\n")
-                    if eq.expected_keywords:
-                        f.write(f"Expected Keywords: {', '.join(eq.expected_keywords)}\n")
-                    f.write(f"Retrieval Score: {score:.4f}\n\n")
-                    
-                    f.write(f"{'-' * 80}\n")
-                    f.write("RETRIEVED CONTEXT:\n")
-                    f.write(f"{'-' * 80}\n\n")
-                    
-                    for j, ctx in enumerate(context, 1):
-                        f.write(f"[{j}] Similarity: {ctx.get('score', 0):.4f}\n")
-                        f.write(f"    Talk ID: {ctx.get('talk_id')}\n")
-                        f.write(f"    Title: {ctx.get('title')}\n")
-                        chunk_text = ctx.get('chunk', '')
-                        f.write(f"    Chunk: {chunk_text[:200]}...\n\n")
-                    
-                    f.write(f"{'-' * 80}\n")
-                    f.write("LLM RESPONSE:\n")
-                    f.write(f"{'-' * 80}\n\n")
-                    f.write(f"{answer}\n\n")
+            for eq in eval_set:
+                matches = query_index(index, scheme.scheme_id, embedding_client, eq.question, top_k)
+                scores.append(score_matches(matches, eq))
             
             mean_score = sum(scores) / max(1, len(scores))
             results.append(
@@ -566,10 +494,9 @@ def evaluate_grid(index, embedding_client: OpenAI, chat_client: OpenAI, schemes:
                     "overlap_ratio": scheme.overlap_ratio,
                     "top_k": top_k,
                     "mean_eval_score": mean_score,
-                    "output_file": output_file,
                 }
             )
-            print(f"[{config_num}/{total_configs}] {scheme.scheme_id} top_k={top_k}: score={mean_score:.4f} → {output_file}")
+            print(f"[{config_num}/{total_configs}] {scheme.scheme_id} top_k={top_k}: score={mean_score:.4f}")
     
     results.sort(key=lambda x: x["mean_eval_score"], reverse=True)
     return results
@@ -636,7 +563,6 @@ def rag_answer(embedding_client: OpenAI, chat_client: OpenAI, index, scheme_id: 
 def build_and_upsert_all_schemes(index, embedding_client: OpenAI, df: pd.DataFrame, schemes: List[ChunkScheme]) -> None:
     """
     Build chunks for all schemes and upload to Pinecone.
-    Skips namespaces that already have vectors to avoid re-embedding.
     
     Args:
         index: Pinecone index instance
@@ -646,17 +572,6 @@ def build_and_upsert_all_schemes(index, embedding_client: OpenAI, df: pd.DataFra
     """
     for i, scheme in enumerate(schemes, 1):
         print(f"[{i}/{len(schemes)}] Processing scheme: {scheme.scheme_id}")
-        
-        # Check if namespace already has vectors
-        try:
-            stats = index.describe_index_stats()
-            namespace_stats = stats.get('namespaces', {})
-            if scheme.scheme_id in namespace_stats and namespace_stats[scheme.scheme_id].get('vector_count', 0) > 0:
-                print(f"  ⏭️  Namespace '{scheme.scheme_id}' already has {namespace_stats[scheme.scheme_id]['vector_count']} vectors, skipping")
-                continue
-        except Exception as e:
-            print(f"  Warning: Could not check namespace stats: {e}")
-        
         chunks = build_chunks_for_scheme(df, scheme, store_chunk_text_in_metadata=True)
         print(f"  Created {len(chunks)} chunks, uploading to Pinecone...")
         upsert_chunks(index, scheme.scheme_id, embedding_client, chunks)
@@ -787,16 +702,12 @@ def main():
     eval_set = [
         # Type 1: Precise Fact Retrieval (5 queries)
         EvalQuery("Find a TED talk about CRISPR and gene editing. Provide the title and speaker.", 
-                  expected_talk_id="2354",
                   expected_keywords=["CRISPR", "DNA", "gene"]),
         EvalQuery("Which TED talk discusses AI and what it can and cannot do?", 
-                  expected_talk_id="3633",
                   expected_keywords=["AI", "artificial", "intelligence"]),
         EvalQuery("Find a TED talk about climate change and nuclear power.", 
-                  expected_talk_id="2633",
                   expected_keywords=["climate", "nuclear", "power"]),
         EvalQuery("Which speaker talks about memory and how our brain works?", 
-                  expected_talk_id="1878",
                   expected_keywords=["memory", "brain", "cognitive"]),
         EvalQuery("Find a TED talk about depression or mental health.", 
                   expected_keywords=["depression", "mental", "health"]),
@@ -825,23 +736,19 @@ def main():
         
         # Type 4: Recommendation with Evidence-Based Justification (4 queries)
         EvalQuery("I'm interested in learning about gene editing technology. Which talk would you recommend?", 
-                  expected_talk_id="2354",
                   expected_keywords=["gene", "DNA", "genome"]),
         EvalQuery("Recommend a TED talk that could help me understand what AI can and cannot do.", 
-                  expected_talk_id="3633",
                   expected_keywords=["AI", "artificial", "machine"]),
         EvalQuery("I want to learn about solutions to climate change. Which TED talk should I watch?", 
-                  expected_talk_id="2633",
                   expected_keywords=["climate", "change", "solution"]),
         EvalQuery("Suggest a TED talk for someone interested in how the brain and memory work.", 
-                  expected_talk_id="1878",
                   expected_keywords=["brain", "memory", "mind"]),
     ]
     print(f"Created {len(eval_set)} evaluation queries")
 
     # 3) Retrieval-only grid evaluation
     print("\n=== Grid Search Evaluation ===")
-    results = evaluate_grid(index, embedding_client, chat_client, schemes, topk_grid, eval_set)
+    results = evaluate_grid(index, embedding_client, schemes, topk_grid, eval_set)
     
     print("\n=== Top 5 Configurations ===")
     for i, config in enumerate(results[:5], 1):

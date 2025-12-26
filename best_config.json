@@ -1,0 +1,6 @@
+{
+  "scheme_id": "cs1024_ol10",
+  "chunk_size": 1024,
+  "overlap_ratio": 0.1,
+  "top_k": 15
+}
