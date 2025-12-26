@@ -910,11 +910,66 @@ def main():
     print("\n=== BEST CONFIG ===")
     print(json.dumps(best, indent=2))
 
-    # 4) Example end-to-end
-    q = "I'm looking for a TED talk about climate change and what individuals can do in their daily lives. Which talk would you recommend?"
-    out = rag_answer(embedding_client, chat_client, index, best["scheme_id"], best["top_k"], q)
-    print("\n=== Answer ===")
-    print(out["response"])
+    # 4) Example end-to-end: Test all 4 query types with best config
+    print("\n=== Testing Best Configuration with Example Queries ===")
+    
+    example_queries = [
+        ("Type 1: Fact Retrieval", "Find a TED talk about CRISPR and gene editing. Provide the title and speaker."),
+        ("Type 2: Multi-Result Listing", "List 3 TED talks about technology and innovation."),
+        ("Type 3: Summary Extraction", "Find a TED talk about effective altruism. Provide the title and a short summary of the key idea."),
+        ("Type 4: Recommendation", "Recommend a TED talk that could help me understand what AI can and cannot do."),
+    ]
+    
+    output_file = "best_config_examples.txt"
+    with open(output_file, "w", encoding="utf-8") as f:
+        f.write("=" * 80 + "\n")
+        f.write("BEST CONFIGURATION - END-TO-END EXAMPLES\n")
+        f.write("=" * 80 + "\n\n")
+        f.write("CONFIGURATION DETAILS:\n")
+        f.write(f"Scheme ID: {best['scheme_id']}\n")
+        f.write(f"Chunk Size: {best['chunk_size']} tokens\n")
+        f.write(f"Overlap Ratio: {best['overlap_ratio']}\n")
+        f.write(f"Top-K: {best['top_k']}\n")
+        f.write(f"Mean Evaluation Score: {best['mean_eval_score']:.4f}\n")
+        f.write("=" * 80 + "\n\n")
+        
+        for i, (query_type, question) in enumerate(example_queries, 1):
+            print(f"Testing {query_type}...")
+            
+            try:
+                out = rag_answer(embedding_client, chat_client, index, best["scheme_id"], best["top_k"], question)
+                
+                f.write(f"\n{'=' * 80}\n")
+                f.write(f"EXAMPLE {i}: {query_type}\n")
+                f.write(f"{'=' * 80}\n\n")
+                f.write(f"Question: {question}\n\n")
+                
+                f.write(f"{'-' * 80}\n")
+                f.write("RETRIEVED CONTEXT:\n")
+                f.write(f"{'-' * 80}\n\n")
+                
+                for j, ctx in enumerate(out["context"], 1):
+                    f.write(f"[{j}] Similarity: {ctx.get('score', 0):.4f}\n")
+                    f.write(f"    Talk ID: {ctx.get('talk_id')}\n")
+                    f.write(f"    Title: {ctx.get('title')}\n")
+                    chunk_text = ctx.get('chunk', '')
+                    f.write(f"    Chunk: {chunk_text[:200]}...\n\n")
+                
+                f.write(f"{'-' * 80}\n")
+                f.write("LLM RESPONSE:\n")
+                f.write(f"{'-' * 80}\n\n")
+                f.write(f"{out['response']}\n\n")
+                
+                # Also print to console
+                print(f"✓ {query_type} completed")
+                
+            except Exception as e:
+                f.write(f"\n[ERROR: {e}]\n\n")
+                print(f"✗ {query_type} failed: {e}")
+    
+    print(f"\n✓ Example results saved to: {output_file}")
+    print(f"\nSample answer (Type 4):")
+    print(out["response"][:1000] + "...")
 
     # Save best config for later use (e.g., /api/stats)
     with open("best_config.json", "w", encoding="utf-8") as f:
