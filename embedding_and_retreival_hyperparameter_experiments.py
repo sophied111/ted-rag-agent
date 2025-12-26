@@ -541,23 +541,20 @@ def evaluate_grid(index, embedding_client: OpenAI, chat_client: OpenAI, schemes:
     total_configs = len(schemes) * len(topk_grid)
     config_num = 0
     
-    # Create output directory with timestamp if it exists
-    if os.path.exists("evaluation_results"):
-        timestamp = time.strftime("%Y%m%d_%H%M%S")
-        output_dir = f"evaluation_results_{timestamp}"
-        print(f"Note: 'evaluation_results' folder exists, using '{output_dir}' instead\n")
-    else:
-        output_dir = "evaluation_results"
-    
+    # Create output directory
+    output_dir = "evaluation_results"
     os.makedirs(output_dir, exist_ok=True)
+    
+    # Generate timestamp for this evaluation run
+    timestamp = time.strftime("%Y%m%d_%H%M%S")
     
     for scheme in schemes:
         for top_k in topk_grid:
             config_num += 1
             scores = []
             
-            # Prepare detailed output file
-            output_file = f"{output_dir}/eval_{scheme.scheme_id}_topk{top_k}.txt"
+            # Prepare detailed output file with timestamp
+            output_file = f"{output_dir}/eval_{scheme.scheme_id}_topk{top_k}_{timestamp}.txt"
             
             with open(output_file, "w", encoding="utf-8") as f:
                 f.write("=" * 80 + "\n")
@@ -690,29 +687,34 @@ def rag_answer(embedding_client: OpenAI, chat_client: OpenAI, index, scheme_id: 
 # Orchestration
 # =============================
 
-def build_and_upsert_all_schemes(index, embedding_client: OpenAI, df: pd.DataFrame, schemes: List[ChunkScheme]) -> None:
+def build_and_upsert_all_schemes(index, embedding_client: OpenAI, df: pd.DataFrame, schemes: List[ChunkScheme], force_reembed: bool = False) -> None:
     """
     Build chunks for all schemes and upload to Pinecone.
-    Skips namespaces that already have vectors to avoid re-embedding.
     
     Args:
         index: Pinecone index instance
         embedding_client: OpenAI client for embeddings
         df: DataFrame with TED talks
         schemes: List of chunking schemes to process
+        force_reembed: If True, re-embed data even if namespace already has vectors.
+                      If False, skip namespaces that already have vectors.
     """
     for i, scheme in enumerate(schemes, 1):
         print(f"[{i}/{len(schemes)}] Processing scheme: {scheme.scheme_id}")
         
-        # Check if namespace already has vectors
-        try:
-            stats = index.describe_index_stats()
-            namespace_stats = stats.get('namespaces', {})
-            if scheme.scheme_id in namespace_stats and namespace_stats[scheme.scheme_id].get('vector_count', 0) > 0:
-                print(f"  ⏭️  Namespace '{scheme.scheme_id}' already has {namespace_stats[scheme.scheme_id]['vector_count']} vectors, skipping")
-                continue
-        except Exception as e:
-            print(f"  Warning: Could not check namespace stats: {e}")
+        # Check if namespace already has vectors (unless force_reembed is True)
+        if not force_reembed:
+            try:
+                stats = index.describe_index_stats()
+                namespace_stats = stats.get('namespaces', {})
+                if scheme.scheme_id in namespace_stats and namespace_stats[scheme.scheme_id].get('vector_count', 0) > 0:
+                    print(f"  ⏭️  Namespace '{scheme.scheme_id}' already has {namespace_stats[scheme.scheme_id]['vector_count']} vectors, skipping")
+                    print(f"     (Set FORCE_REEMBED=true to override)")
+                    continue
+            except Exception as e:
+                print(f"  Warning: Could not check namespace stats: {e}")
+        else:
+            print(f"  🔄 Force re-embedding enabled, will overwrite existing data")
         
         chunks = build_chunks_for_scheme(df, scheme, store_chunk_text_in_metadata=True)
         print(f"  Created {len(chunks)} chunks, uploading to Pinecone...")
@@ -836,7 +838,10 @@ def main():
 
     # 1) Embed+upsert once per namespace (scheme)
     print("\n=== Embedding & Upserting Chunks ===")
-    build_and_upsert_all_schemes(index, embedding_client, df, schemes)
+    force_reembed = os.getenv("FORCE_REEMBED", "false").lower() in ("true", "1", "yes")
+    if force_reembed:
+        print("⚠️  FORCE_REEMBED enabled - will re-embed all data even if it exists")
+    build_and_upsert_all_schemes(index, embedding_client, df, schemes, force_reembed=force_reembed)
 
     # 2) Expanded evaluation set: 18 queries covering all 4 capability types
     # Queries specifically match talks in the 100-talk sample (seed=7, sample_n=100)
