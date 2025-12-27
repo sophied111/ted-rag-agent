@@ -1,0 +1,39 @@
+[project]
+name = "ted-talk-rag-assistant"
+version = "1.0.0"
+description = "TED Talk RAG Assistant with hybrid retrieval and Vercel deployment"
+readme = "README_DEPLOYMENT.md"
+requires-python = ">=3.12"
+license = {text = "MIT"}
+authors = [
+    {name = "Sophie", email = ""}
+]
+keywords = ["rag", "ted-talks", "nlp", "retrieval", "ai"]
+
+dependencies = [
+    "openai>=1.0.0",
+    "pinecone-client>=3.0.0",
+    "pandas>=2.0.0"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "black>=23.0.0",
+    "flake8>=6.0.0"
+]
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["api"]
+
+[tool.black]
+line-length = 120
+target-version = ['py312']
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
