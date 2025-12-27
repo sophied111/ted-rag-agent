@@ -498,9 +498,10 @@ def hybrid_query(index, scheme_id: str, embedding_client: OpenAI, question: str,
             better_match = match if match.metadata.get('chunk_type') != 'metadata' else existing_match
             talk_scores[talk_id] = (new_score, better_match)
     
-    # Sort by combined score and return top_k
+    # Sort by combined score and return top_k with both scores
     sorted_matches = sorted(talk_scores.items(), key=lambda x: x[1][0], reverse=True)
-    final_matches = [match for _, (score, match) in sorted_matches[:top_k]]
+    # Return tuples of (combined_score, match) to preserve both RRF and similarity scores
+    final_matches = [(score, match) for _, (score, match) in sorted_matches[:top_k]]
     
     return final_matches
 
@@ -710,7 +711,7 @@ def score_matches(matches, eq: EvalQuery) -> float:
     3. Fallback: average similarity score from Pinecone
     
     Args:
-        matches: List of Pinecone match objects
+        matches: List of tuples (combined_score, match_object) or match objects
         eq: Evaluation query with expected results
         
     Returns:
@@ -719,8 +720,11 @@ def score_matches(matches, eq: EvalQuery) -> float:
     if not matches:
         return 0.0
 
+    # Handle both tuple format (combined_score, match) and plain match objects
+    match_objects = [m[1] if isinstance(m, tuple) else m for m in matches]
+
     if eq.expected_talk_id:
-        return 1.0 if any(str((m.metadata or {}).get("talk_id")) == str(eq.expected_talk_id) for m in matches) else 0.0
+        return 1.0 if any(str((m.metadata or {}).get("talk_id")) == str(eq.expected_talk_id) for m in match_objects) else 0.0
 
     if eq.expected_keywords:
         blob = " ".join(
@@ -735,14 +739,14 @@ def score_matches(matches, eq: EvalQuery) -> float:
                     ]
                 )
             ).lower()
-            for m in matches
+            for m in match_objects
         )
         kws = [k.lower() for k in eq.expected_keywords]
         hit = sum(1 for k in kws if k in blob)
         return hit / max(1, len(kws))
 
     # fallback: mean similarity score (relative comparisons only)
-    return sum(float(m.score) for m in matches) / len(matches)
+    return sum(float(m.score) for m in match_objects) / len(match_objects)
 
 def evaluate_grid(index, embedding_client: OpenAI, df: pd.DataFrame, schemes: List[ChunkScheme], topk_grid: List[int], eval_set: List[EvalQuery]) -> List[Dict]:
     """
@@ -823,9 +827,21 @@ def evaluate_grid(index, embedding_client: OpenAI, df: pd.DataFrame, schemes: Li
                     f.write("RETRIEVED CONTEXT:\n")
                     f.write(f"{'-' * 80}\n\n")
                     
-                    for j, m in enumerate(matches, 1):
+                    for j, match_item in enumerate(matches, 1):
+                        # Handle tuple format (combined_score, match)
+                        if isinstance(match_item, tuple):
+                            combined_score, m = match_item
+                        else:
+                            combined_score = None
+                            m = match_item
+                        
                         md = m.metadata or {}
-                        f.write(f"[{j}] Similarity: {float(m.score):.4f}\n")
+                        pinecone_similarity = float(m.score)
+                        
+                        f.write(f"[{j}] Pinecone Similarity: {pinecone_similarity:.4f}")
+                        if combined_score is not None:
+                            f.write(f" | RRF Combined Score: {combined_score:.4f}")
+                        f.write(f"\n")
                         f.write(f"    Talk ID: {md.get('talk_id')}\n")
                         f.write(f"    Title: {md.get('title')}\n")
                         chunk_text = md.get('chunk', '')
@@ -874,7 +890,9 @@ def build_prompt(question: str, matches) -> str:
 def rag_answer(embedding_client: OpenAI, chat_client: OpenAI, index, scheme_id: str, top_k: int, question: str) -> Dict:
     # Use hybrid search for better retrieval (metadata + content)
     matches = hybrid_query(index, scheme_id, embedding_client, question, top_k)
-    user_prompt = build_prompt(question, matches)
+    # Extract match objects from tuples for prompt building
+    match_objects = [m[1] if isinstance(m, tuple) else m for m in matches]
+    user_prompt = build_prompt(question, match_objects)
 
     chat = chat_client.chat.completions.create(
         model=CHAT_MODEL,
@@ -885,16 +903,24 @@ def rag_answer(embedding_client: OpenAI, chat_client: OpenAI, index, scheme_id: 
     )
 
     context = []
-    for m in matches:
+    for match_item in matches:
+        # Handle tuple format (combined_score, match)
+        if isinstance(match_item, tuple):
+            combined_score, m = match_item
+        else:
+            combined_score = None
+            m = match_item
+        
         md = m.metadata or {}
-        context.append(
-            {
-                "talk_id": md.get("talk_id"),
-                "title": md.get("title"),
-                "chunk": md.get("chunk", ""),
-                "score": float(m.score),
-            }
-        )
+        ctx_entry = {
+            "talk_id": md.get("talk_id"),
+            "title": md.get("title"),
+            "chunk": md.get("chunk", ""),
+            "pinecone_similarity": float(m.score),
+        }
+        if combined_score is not None:
+            ctx_entry["rrf_combined_score"] = combined_score
+        context.append(ctx_entry)
 
     return {
         "response": chat.choices[0].message.content,
@@ -1245,7 +1271,11 @@ def main():
                 f.write(f"{'-' * 80}\n\n")
                 
                 for j, ctx in enumerate(out["context"], 1):
-                    f.write(f"[{j}] Similarity: {ctx.get('score', 0):.4f}\n")
+                    pinecone_sim = ctx.get('pinecone_similarity', ctx.get('score', 0))
+                    f.write(f"[{j}] Pinecone Similarity: {pinecone_sim:.4f}")
+                    if 'rrf_combined_score' in ctx:
+                        f.write(f" | RRF Combined Score: {ctx['rrf_combined_score']:.4f}")
+                    f.write(f"\n")
                     f.write(f"    Talk ID: {ctx.get('talk_id')}\n")
                     f.write(f"    Title: {ctx.get('title')}\n")
                     chunk_text = ctx.get('chunk', '')
