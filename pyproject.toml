@@ -6,7 +6,7 @@ readme = "README_DEPLOYMENT.md"
 requires-python = ">=3.12"
 license = {text = "MIT"}
 authors = [
-    {name = "Sophie", email = ""}
+    {name = "Sophie"}
 ]
 keywords = ["rag", "ted-talks", "nlp", "retrieval", "ai"]
 
