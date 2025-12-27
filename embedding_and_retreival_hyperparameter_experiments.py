@@ -418,6 +418,10 @@ def load_sample_talks(csv_path: str, sample_n: int, seed: int) -> pd.DataFrame:
     
     df = df.dropna(subset=REQUIRED_COLS)
     
+    # CRITICAL: Sort by talk_id to ensure consistent ordering across runs
+    # This ensures DataFrame iteration order is deterministic even if CSV or dropna() changes
+    df = df.sort_values('talk_id').reset_index(drop=True)
+    
     # Set random seed for reproducibility
     random.seed(seed)
     
@@ -450,10 +454,12 @@ def load_sample_talks(csv_path: str, sample_n: int, seed: int) -> pd.DataFrame:
                 topic_matches.append(idx)
         
         # Sample min_per_topic from this topic
-        if len(topic_matches) >= min_per_topic:
-            selected = random.sample(topic_matches, min_per_topic)
+        # CRITICAL: Sort to ensure deterministic random.sample() behavior
+        topic_matches_sorted = sorted(topic_matches)
+        if len(topic_matches_sorted) >= min_per_topic:
+            selected = random.sample(topic_matches_sorted, min_per_topic)
         else:
-            selected = topic_matches
+            selected = topic_matches_sorted
         
         for idx in selected:
             sampled_ids.add(str(df.loc[idx, 'talk_id']))
@@ -463,10 +469,12 @@ def load_sample_talks(csv_path: str, sample_n: int, seed: int) -> pd.DataFrame:
     remaining_needed = sample_n - len(topic_samples)
     if remaining_needed > 0:
         remaining_pool = [idx for idx in df.index if str(df.loc[idx, 'talk_id']) not in sampled_ids]
-        if len(remaining_pool) > remaining_needed:
-            additional = random.sample(remaining_pool, remaining_needed)
+        # CRITICAL: Sort to ensure deterministic random.sample() behavior
+        remaining_pool_sorted = sorted(remaining_pool)
+        if len(remaining_pool_sorted) > remaining_needed:
+            additional = random.sample(remaining_pool_sorted, remaining_needed)
         else:
-            additional = remaining_pool
+            additional = remaining_pool_sorted
         topic_samples.extend(additional)
     
     # Create final sample
@@ -872,10 +880,22 @@ def main():
             raise ValueError(f"top_k {k} exceeds max {MAX_TOP_K}")
 
     # Load sample talks
-    random.seed(seed)
+    # Note: load_sample_talks() sets random.seed internally, no need to set it here
     df = load_sample_talks(csv_path, sample_n=sample_n, seed=seed)
     print(f"Loaded {len(df)} talks")
     print(f"Testing {len(schemes)} schemes × {len(topk_grid)} top_k = {len(schemes) * len(topk_grid)} configurations")
+    
+    # Print sample talk IDs and titles
+    print("\n" + "=" * 60)
+    print("SAMPLED TALKS")
+    print("=" * 60)
+    for idx, row in df.iterrows():
+        talk_id = str(row.get("talk_id", "")).strip()
+        title = str(row.get("title", "")).strip()
+        speaker = str(row.get("speaker_1", "")).strip()
+        print(f"[{talk_id}] {title}")
+        print(f"         Speaker: {speaker}")
+    print("=" * 60 + "\n")
 
     # Clients
     embedding_client, chat_client, pc = make_clients()
@@ -898,20 +918,21 @@ def main():
     print("\n=== Building Evaluation Set ===")
     eval_set = [
         # Type 1: Precise Fact Retrieval (5 queries)
-        EvalQuery("Find a TED talk about CRISPR and gene editing. Provide the title and speaker.", 
-                  expected_talk_id="2354",
-                  expected_keywords=["CRISPR", "DNA", "gene"]),
-        EvalQuery("Which TED talk discusses AI and what it can and cannot do?", 
-                  expected_talk_id="3633",
-                  expected_keywords=["AI", "artificial", "intelligence"]),
-        EvalQuery("Find a TED talk about climate change and nuclear power.", 
-                  expected_talk_id="2633",
-                  expected_keywords=["climate", "nuclear", "power"]),
-        EvalQuery("Which speaker talks about memory and how our brain works?", 
-                  expected_talk_id="1878",
-                  expected_keywords=["memory", "brain", "cognitive"]),
-        EvalQuery("Find a TED talk about depression or mental health.", 
-                  expected_keywords=["depression", "mental", "health"]),
+        EvalQuery("Find a TED talk about experience versus memory. Provide the title and speaker.", 
+                  expected_talk_id="779",
+                  expected_keywords=["experience", "memory", "riddle"]),
+        EvalQuery("Which TED talk discusses gravitational waves and LIGO?", 
+                  expected_talk_id="2886",
+                  expected_keywords=["LIGO", "gravitational", "waves"]),
+        EvalQuery("Find a TED talk about growing fresh air with plants.", 
+                  expected_talk_id="490",
+                  expected_keywords=["fresh", "air", "plants"]),
+        EvalQuery("Which speaker talks about stress and its effects on the brain?", 
+                  expected_talk_id="24275",
+                  expected_keywords=["stress", "brain", "cortisol"]),
+        EvalQuery("Find a TED talk about mental illness and comedy.", 
+                  expected_talk_id="1584",
+                  expected_keywords=["mental", "illness", "funny"]),
         
         # Type 2: Multi-Result Topic Listing (5 queries - requesting 3 results)
         EvalQuery("Which TED talks focus on brain science and cognition? Return 3 talk titles.", 
@@ -926,30 +947,32 @@ def main():
                   expected_keywords=["social", "humanity", "culture"]),
         
         # Type 3: Key Idea Summary Extraction (4 queries)
-        EvalQuery("Find a TED talk about effective altruism. Provide the title and a short summary of the key idea.", 
-                  expected_talk_id="1746",
-                  expected_keywords=["altruism", "philanthropy", "helping"]),
-        EvalQuery("What is the main idea presented in a TED talk about babies and infant intelligence?", 
-                  expected_talk_id="752",
-                  expected_keywords=["babies", "infant", "children"]),
-        EvalQuery("Summarize the key message from a TED talk about minimalism or living with less.", 
-                  expected_keywords=["less", "happiness", "minimalism"]),
-        EvalQuery("What's the central theme of a TED talk discussing statistics and data?", 
-                  expected_keywords=["statistics", "data", "misleading"]),
+        EvalQuery("Find a TED talk about asking for help. Provide the title and a short summary of the key idea.", 
+                  expected_talk_id="2712",
+                  expected_keywords=["help", "strength", "weakness"]),
+        EvalQuery("What is the main idea presented in a TED talk about living to be 100?", 
+                  expected_talk_id="727",
+                  expected_keywords=["longevity", "100", "centenarian"]),
+        EvalQuery("Summarize the key message from a TED talk about the art of choosing.", 
+                  expected_talk_id="924",
+                  expected_keywords=["choice", "choosing", "decisions"]),
+        EvalQuery("What's the central theme of a TED talk discussing whether the world is getting better?", 
+                  expected_talk_id="15274",
+                  expected_keywords=["world", "better", "worse", "numbers"]),
         
         # Type 4: Recommendation with Evidence-Based Justification (4 queries)
-        EvalQuery("I'm interested in learning about gene editing technology. Which talk would you recommend?", 
-                  expected_talk_id="2354",
-                  expected_keywords=["gene", "DNA", "genome"]),
-        EvalQuery("Recommend a TED talk that could help me understand what AI can and cannot do.", 
-                  expected_talk_id="3633",
-                  expected_keywords=["AI", "artificial", "machine"]),
-        EvalQuery("I want to learn about solutions to climate change. Which TED talk should I watch?", 
-                  expected_talk_id="2633",
-                  expected_keywords=["climate", "change", "solution"]),
-        EvalQuery("Suggest a TED talk for someone interested in how the brain and memory work.", 
-                  expected_talk_id="1878",
-                  expected_keywords=["brain", "memory", "mind"]),
+        EvalQuery("I'm interested in learning about augmented reality in medicine. Which talk would you recommend?", 
+                  expected_talk_id="6477",
+                  expected_keywords=["augmented", "reality", "surgery"]),
+        EvalQuery("Recommend a TED talk that could help me understand how to work with intelligent machines.", 
+                  expected_talk_id="2787",
+                  expected_keywords=["intelligent", "machines", "fear"]),
+        EvalQuery("I want to learn about solving medical mysteries. Which TED talk should I watch?", 
+                  expected_talk_id="445",
+                  expected_keywords=["medical", "mysteries", "diagnosis"]),
+        EvalQuery("Suggest a TED talk for someone interested in experience versus memory.", 
+                  expected_talk_id="779",
+                  expected_keywords=["experience", "memory", "happiness"]),
     ]
     print(f"Created {len(eval_set)} evaluation queries")
 
@@ -969,10 +992,10 @@ def main():
     print("\n=== Testing Best Configuration with Example Queries ===")
     
     example_queries = [
-        ("Type 1: Fact Retrieval", "Find a TED talk about CRISPR and gene editing. Provide the title and speaker."),
+        ("Type 1: Fact Retrieval", "Find a TED talk about gravitational waves and LIGO. Provide the title and speaker."),
         ("Type 2: Multi-Result Listing", "List 3 TED talks about technology and innovation."),
-        ("Type 3: Summary Extraction", "Find a TED talk about effective altruism. Provide the title and a short summary of the key idea."),
-        ("Type 4: Recommendation", "Recommend a TED talk that could help me understand what AI can and cannot do."),
+        ("Type 3: Summary Extraction", "Find a TED talk about asking for help. Provide the title and a short summary of the key idea."),
+        ("Type 4: Recommendation", "Recommend a TED talk about how stress affects the brain."),
     ]
     
     output_file = "best_config_examples.txt"
