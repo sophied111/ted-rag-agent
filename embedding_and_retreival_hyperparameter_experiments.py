@@ -541,20 +541,18 @@ def evaluate_grid(index, embedding_client: OpenAI, schemes: List[ChunkScheme], t
     total_configs = len(schemes) * len(topk_grid)
     config_num = 0
     
-    # Create output directory
-    output_dir = "evaluation_results"
-    os.makedirs(output_dir, exist_ok=True)
-    
-    # Generate timestamp for this evaluation run
+    # Create output directory with timestamp subfolder
     timestamp = time.strftime("%Y%m%d_%H%M%S")
+    output_dir = f"evaluation_results/{timestamp}"
+    os.makedirs(output_dir, exist_ok=True)
     
     for scheme in schemes:
         for top_k in topk_grid:
             config_num += 1
             scores = []
             
-            # Prepare detailed output file with timestamp
-            output_file = f"{output_dir}/eval_{scheme.scheme_id}_topk{top_k}_{timestamp}.txt"
+            # Prepare detailed output file
+            output_file = f"{output_dir}/eval_{scheme.scheme_id}_topk{top_k}.txt"
             
             with open(output_file, "w", encoding="utf-8") as f:
                 f.write("=" * 80 + "\n")
@@ -796,7 +794,7 @@ def main():
     # Strategic chunking schemes: 6 combinations balancing cost and coverage
     # Testing chunk sizes: 512, 1024, 1536 with overlaps: 0.1 (low), 0.2 (medium), 0.25 (high)
     schemes = [
-        ChunkScheme("cs512_ol20", 512, 0.20),           # Small baseline
+        ChunkScheme("cs512_ol20", 512, 0.10),           # Small baseline
         ChunkScheme("cs1024_ol10", 1024, 0.10),         # Medium, low overlap
         ChunkScheme("cs1024_ol20", 1024, 0.20),         # Medium baseline
         ChunkScheme("cs1024_ol25", 1024, 0.25),         # Medium, high overlap
@@ -828,9 +826,10 @@ def main():
 
     # 1) Embed+upsert once per namespace (scheme)
     print("\n=== Embedding & Upserting Chunks ===")
-    force_reembed = os.getenv("FORCE_REEMBED", "false").lower() in ("true", "1", "yes")
+    force_reembed = os.getenv("FORCE_REEMBED", "False").lower() in ("True", "1", "yes")
     if force_reembed:
         print("⚠️  FORCE_REEMBED enabled - will re-embed all data even if it exists")
+    time.sleep(5)
     build_and_upsert_all_schemes(index, embedding_client, df, schemes, force_reembed=force_reembed)
 
     # 2) Expanded evaluation set: 18 queries covering all 4 capability types
