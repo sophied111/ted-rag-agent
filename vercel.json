@@ -1,0 +1,33 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/**/*.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "index.html",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/prompt",
+      "dest": "/api/prompt.py"
+    },
+    {
+      "src": "/api/stats",
+      "dest": "/api/stats.py"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ],
+  "env": {
+    "OPENAI_API_KEY": "@openai_api_key",
+    "PINECONE_API_KEY": "@pinecone_api_key",
+    "PINECONE_INDEX": "@pinecone_index",
+    "EMBEDDING_API_KEY": "@embedding_api_key"
+  }
+}

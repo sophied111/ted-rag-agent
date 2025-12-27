@@ -1,0 +1,10 @@
+ted_talks_en.csv
+evaluation_results/
+*.txt
+*.md
+test_*.py
+embedding_and_retreival_hyperparameter_experiments.py
+__pycache__/
+*.pyc
+.env
+.git/
