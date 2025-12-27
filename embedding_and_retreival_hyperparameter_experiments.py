@@ -737,6 +737,8 @@ def build_and_upsert_all_schemes(index, embedding_client: OpenAI, df: pd.DataFra
                 print(f"  Warning: Could not check namespace stats: {e}")
         else:
             print(f"  🔄 Force re-embedding enabled, will overwrite existing data")
+            # Delete all records within that namespace
+            index.delete(delete_all=True, namespace=scheme.scheme_id)
         
         chunks = build_chunks_for_scheme(df, scheme, store_chunk_text_in_metadata=True)
         print(f"  Created {len(chunks)} chunks, uploading to Pinecone...")
@@ -860,7 +862,7 @@ def main():
 
     # 1) Embed+upsert once per namespace (scheme)
     print("\n=== Embedding & Upserting Chunks ===")
-    force_reembed = os.getenv("FORCE_REEMBED", "False").lower() in ("True", "1", "yes")
+    force_reembed = os.getenv("FORCE_REEMBED", "false").lower() in ("true", "1", "yes")
     if force_reembed:
         print("⚠️  FORCE_REEMBED enabled - will re-embed all data even if it exists")
     time.sleep(5)
