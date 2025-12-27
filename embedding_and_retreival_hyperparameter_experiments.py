@@ -564,12 +564,15 @@ def score_matches(matches, eq: EvalQuery) -> float:
     # fallback: mean similarity score (relative comparisons only)
     return sum(float(m.score) for m in matches) / len(matches)
 
-def evaluate_grid(index, embedding_client: OpenAI, schemes: List[ChunkScheme], topk_grid: List[int], eval_set: List[EvalQuery]) -> List[Dict]:
+def evaluate_grid(index, embedding_client: OpenAI, df: pd.DataFrame, schemes: List[ChunkScheme], topk_grid: List[int], eval_set: List[EvalQuery]) -> List[Dict]:
     """
     Evaluate all configurations and save detailed results to text files.
     
     For each configuration, creates a file like 'eval_cs512_ol20_topk5.txt'
     containing queries, retrieved context, and similarity scores.
+    
+    Args:
+        df: DataFrame with sampled TED talks (to log sample info)
     """
     results: List[Dict] = []
     total_configs = len(schemes) * len(topk_grid)
@@ -596,6 +599,19 @@ def evaluate_grid(index, embedding_client: OpenAI, schemes: List[ChunkScheme], t
                 f.write(f"Chunk Size: {scheme.chunk_tokens} tokens\n")
                 f.write(f"Overlap Ratio: {scheme.overlap_ratio}\n")
                 f.write(f"Top-K: {top_k}\n")
+                f.write("=" * 80 + "\n\n")
+                
+                # Add sample dataset information
+                f.write("SAMPLE DATASET INFORMATION:\n")
+                f.write(f"Total talks in sample: {len(df)}\n\n")
+                f.write("Sample Talk IDs and Titles:\n")
+                f.write("-" * 80 + "\n")
+                for idx, row in df.iterrows():
+                    talk_id = str(row.get("talk_id", "")).strip()
+                    title = str(row.get("title", "")).strip()
+                    speaker = str(row.get("speaker_1", "")).strip()
+                    f.write(f"  [{talk_id}] {title}\n")
+                    f.write(f"           Speaker: {speaker}\n")
                 f.write("=" * 80 + "\n\n")
                 
                 for i, eq in enumerate(eval_set, 1):
@@ -831,7 +847,7 @@ def main():
     # Strategic chunking schemes: 6 combinations balancing cost and coverage
     # Testing chunk sizes: 512, 1024, 1536 with overlaps: 0.1 (low), 0.2 (medium), 0.25 (high)
     schemes = [
-        ChunkScheme("cs512_ol20", 512, 0.10),           # Small baseline
+        ChunkScheme("cs512_ol10", 512, 0.10),           # Small baseline
         ChunkScheme("cs1024_ol10", 1024, 0.10),         # Medium, low overlap
         ChunkScheme("cs1024_ol20", 1024, 0.20),         # Medium baseline
         ChunkScheme("cs1024_ol25", 1024, 0.25),         # Medium, high overlap
@@ -931,7 +947,7 @@ def main():
 
     # 3) Retrieval-only grid evaluation
     print("\n=== Grid Search Evaluation ===")
-    results = evaluate_grid(index, embedding_client, schemes, topk_grid, eval_set)
+    results = evaluate_grid(index, embedding_client, df, schemes, topk_grid, eval_set)
     
     print("\n=== Top 5 Configurations ===")
     for i, config in enumerate(results[:5], 1):
@@ -962,6 +978,19 @@ def main():
         f.write(f"Overlap Ratio: {best['overlap_ratio']}\n")
         f.write(f"Top-K: {best['top_k']}\n")
         f.write(f"Mean Evaluation Score: {best['mean_eval_score']:.4f}\n")
+        f.write("=" * 80 + "\n\n")
+        
+        # Add sample dataset information
+        f.write("SAMPLE DATASET INFORMATION:\n")
+        f.write(f"Total talks in sample: {len(df)}\n\n")
+        f.write("Sample Talk IDs and Titles:\n")
+        f.write("-" * 80 + "\n")
+        for idx, row in df.iterrows():
+            talk_id = str(row.get("talk_id", "")).strip()
+            title = str(row.get("title", "")).strip()
+            speaker = str(row.get("speaker_1", "")).strip()
+            f.write(f"  [{talk_id}] {title}\n")
+            f.write(f"           Speaker: {speaker}\n")
         f.write("=" * 80 + "\n\n")
         
         for i, (query_type, question) in enumerate(example_queries, 1):
