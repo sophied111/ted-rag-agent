@@ -753,9 +753,17 @@ def build_and_upsert_all_schemes(index, embedding_client: OpenAI, df: pd.DataFra
                 print(f"  Warning: Could not check namespace stats: {e}")
         else:
             print(f"  🔄 Force re-embedding enabled, will overwrite existing data")
-            # Delete all records within that namespace
-            index.delete(delete_all=True, namespace=scheme.scheme_id)
-            print(f"All vectors in namespace '{scheme.scheme_id}' have been deleted.")
+            # Delete all vectors in the namespace if it exists
+            try:
+                stats = index.describe_index_stats()
+                namespace_stats = stats.get('namespaces', {})
+                if scheme.scheme_id in namespace_stats and namespace_stats[scheme.scheme_id].get('vector_count', 0) > 0:
+                    index.delete(delete_all=True, namespace=scheme.scheme_id)
+                    print(f"  🗑️  Deleted {namespace_stats[scheme.scheme_id]['vector_count']} existing vectors from namespace '{scheme.scheme_id}'")
+                else:
+                    print(f"  ℹ️  Namespace '{scheme.scheme_id}' is empty or doesn't exist yet")
+            except Exception as e:
+                print(f"  Warning: Could not delete from namespace: {e}")
         
         chunks = build_chunks_for_scheme(df, scheme, store_chunk_text_in_metadata=True)
         print(f"  Created {len(chunks)} chunks, uploading to Pinecone...")
