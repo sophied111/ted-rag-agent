@@ -918,21 +918,21 @@ def main():
     print("\n=== Building Evaluation Set ===")
     eval_set = [
         # Type 1: Precise Fact Retrieval (5 queries)
-        EvalQuery("Find a TED talk about experience versus memory. Provide the title and speaker.", 
-                  expected_talk_id="779",
-                  expected_keywords=["experience", "memory", "riddle"]),
-        EvalQuery("Which TED talk discusses gravitational waves and LIGO?", 
-                  expected_talk_id="2886",
-                  expected_keywords=["LIGO", "gravitational", "waves"]),
+        EvalQuery("Find a TED talk about how your brain hallucinates reality. Provide the title and speaker.", 
+                  expected_talk_id="2817",
+                  expected_keywords=["brain", "hallucinates", "reality"]),
+        EvalQuery("Which TED talk discusses the coming neurological epidemic?", 
+                  expected_talk_id="408",
+                  expected_keywords=["neurological", "epidemic", "Alzheimer"]),
         EvalQuery("Find a TED talk about growing fresh air with plants.", 
                   expected_talk_id="490",
                   expected_keywords=["fresh", "air", "plants"]),
-        EvalQuery("Which speaker talks about stress and its effects on the brain?", 
-                  expected_talk_id="24275",
-                  expected_keywords=["stress", "brain", "cortisol"]),
-        EvalQuery("Find a TED talk about mental illness and comedy.", 
-                  expected_talk_id="1584",
-                  expected_keywords=["mental", "illness", "funny"]),
+        EvalQuery("Which speaker talks about male contraceptive pills?", 
+                  expected_talk_id="13878",
+                  expected_keywords=["male", "contraceptive", "pill"]),
+        EvalQuery("Find a TED talk about solving medical mysteries.", 
+                  expected_talk_id="445",
+                  expected_keywords=["medical", "mysteries", "diagnosis"]),
         
         # Type 2: Multi-Result Topic Listing (5 queries - requesting 3 results)
         EvalQuery("Which TED talks focus on brain science and cognition? Return 3 talk titles.", 
@@ -947,32 +947,32 @@ def main():
                   expected_keywords=["social", "humanity", "culture"]),
         
         # Type 3: Key Idea Summary Extraction (4 queries)
-        EvalQuery("Find a TED talk about asking for help. Provide the title and a short summary of the key idea.", 
-                  expected_talk_id="2712",
-                  expected_keywords=["help", "strength", "weakness"]),
-        EvalQuery("What is the main idea presented in a TED talk about living to be 100?", 
-                  expected_talk_id="727",
-                  expected_keywords=["longevity", "100", "centenarian"]),
-        EvalQuery("Summarize the key message from a TED talk about the art of choosing.", 
-                  expected_talk_id="924",
-                  expected_keywords=["choice", "choosing", "decisions"]),
-        EvalQuery("What's the central theme of a TED talk discussing whether the world is getting better?", 
-                  expected_talk_id="15274",
-                  expected_keywords=["world", "better", "worse", "numbers"]),
+        EvalQuery("Find a TED talk about growing a forest in your backyard. Provide the title and a short summary of the key idea.", 
+                  expected_talk_id="2546",
+                  expected_keywords=["forest", "backyard", "grow"]),
+        EvalQuery("What is the main idea presented in a TED talk about zen koans and breaking your brain?", 
+                  expected_talk_id="21932",
+                  expected_keywords=["zen", "koan", "brain"]),
+        EvalQuery("Summarize the key message from a TED talk about solving social problems.", 
+                  expected_talk_id="757",
+                  expected_keywords=["social", "problems", "nudge"]),
+        EvalQuery("What's the central theme of a TED talk discussing a universal translator for surgeons?", 
+                  expected_talk_id="1652",
+                  expected_keywords=["translator", "surgeons", "universal"]),
         
         # Type 4: Recommendation with Evidence-Based Justification (4 queries)
-        EvalQuery("I'm interested in learning about augmented reality in medicine. Which talk would you recommend?", 
-                  expected_talk_id="6477",
-                  expected_keywords=["augmented", "reality", "surgery"]),
-        EvalQuery("Recommend a TED talk that could help me understand how to work with intelligent machines.", 
-                  expected_talk_id="2787",
-                  expected_keywords=["intelligent", "machines", "fear"]),
-        EvalQuery("I want to learn about solving medical mysteries. Which TED talk should I watch?", 
-                  expected_talk_id="445",
-                  expected_keywords=["medical", "mysteries", "diagnosis"]),
-        EvalQuery("Suggest a TED talk for someone interested in experience versus memory.", 
-                  expected_talk_id="779",
-                  expected_keywords=["experience", "memory", "happiness"]),
+        EvalQuery("I'm interested in learning about the transition to motherhood. Which talk would you recommend?", 
+                  expected_talk_id="22701",
+                  expected_keywords=["motherhood", "transition", "maternal"]),
+        EvalQuery("Recommend a TED talk that could help me understand ancient grains and Africa's prosperity.", 
+                  expected_talk_id="2875",
+                  expected_keywords=["grain", "ancient", "Africa"]),
+        EvalQuery("I want to learn about how bees help cities. Which TED talk should I watch?", 
+                  expected_talk_id="1522",
+                  expected_keywords=["bees", "honey", "city"]),
+        EvalQuery("Suggest a TED talk for someone interested in how the brain creates conscious reality.", 
+                  expected_talk_id="2817",
+                  expected_keywords=["brain", "reality", "conscious"]),
     ]
     print(f"Created {len(eval_set)} evaluation queries")
 
@@ -992,10 +992,10 @@ def main():
     print("\n=== Testing Best Configuration with Example Queries ===")
     
     example_queries = [
-        ("Type 1: Fact Retrieval", "Find a TED talk about gravitational waves and LIGO. Provide the title and speaker."),
+        ("Type 1: Fact Retrieval", "Find a TED talk about how your brain hallucinates reality. Provide the title and speaker."),
         ("Type 2: Multi-Result Listing", "List 3 TED talks about technology and innovation."),
-        ("Type 3: Summary Extraction", "Find a TED talk about asking for help. Provide the title and a short summary of the key idea."),
-        ("Type 4: Recommendation", "Recommend a TED talk about how stress affects the brain."),
+        ("Type 3: Summary Extraction", "Find a TED talk about growing a forest in your backyard. Provide the title and a short summary of the key idea."),
+        ("Type 4: Recommendation", "Recommend a TED talk about the coming neurological epidemic."),
     ]
     
     output_file = "best_config_examples.txt"
