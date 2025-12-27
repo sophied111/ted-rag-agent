@@ -12,7 +12,7 @@ keywords = ["rag", "ted-talks", "nlp", "retrieval", "ai"]
 
 dependencies = [
     "openai>=1.0.0",
-    "pinecone-client>=3.0.0",
+    "pinecone>=3.0.0",
     "pandas>=2.0.0"
 ]
 
