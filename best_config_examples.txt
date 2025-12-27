@@ -1,0 +1,508 @@
+================================================================================
+BEST CONFIGURATION - END-TO-END EXAMPLES
+================================================================================
+
+CONFIGURATION DETAILS:
+Scheme ID: cs512_ol10
+Chunk Size: 512 tokens
+Overlap Ratio: 0.1
+Top-K: 10
+Mean Evaluation Score: 1.0000
+================================================================================
+
+SAMPLE DATASET INFORMATION:
+Total talks in sample: 100
+
+Sample Talk IDs and Titles:
+--------------------------------------------------------------------------------
+  [2817] Your brain hallucinates your conscious reality
+           Speaker: Anil Seth
+  [1532] (Re)touching lives through photos
+           Speaker: Becci Manson
+  [21932] Zen kōans: unsolvable enigmas designed to break your brain
+           Speaker: Puqun Li
+  [510] A theory of everything
+           Speaker: Emily Levine
+  [757] Solving social problems with a nudge
+           Speaker: Sendhil Mullainathan
+  [2875] A forgotten ancient grain that could help Africa prosper
+           Speaker: Pierre Thiam
+  [408] The coming neurological epidemic
+           Speaker: Gregory Petsko
+  [1864] The link between unemployment and terrorism
+           Speaker: Mohamed Ali
+  [13878] How a male contraceptive pill could work
+           Speaker: John Amory
+  [233] My wish: Once Upon a School
+           Speaker: Dave Eggers
+  [22701] A new way to think about the transition to motherhood
+           Speaker: Alexandra Sacks
+  [1652] A universal translator for surgeons
+           Speaker: Steven Schwaitzberg
+  [445] Solving medical mysteries
+           Speaker: Joe DeRisi
+  [859] Can we eat to starve cancer?
+           Speaker: William Li
+  [3671] The future of good food in China
+           Speaker: Matilda Ho
+  [2546] How to grow a forest in your backyard
+           Speaker: Shubhendu Sharma
+  [490] How to grow fresh air
+           Speaker: Kamal Meattle
+  [1522] Every city needs healthy honey bees
+           Speaker: Noah Wilson-Rich
+  [603] Skin color is an illusion
+           Speaker: Nina Jablonski
+  [11226] How we look kilometers below the Antarctic ice sheet
+           Speaker: Dustin Schroeder
+  [2709] Beautiful new words to describe obscure emotions
+           Speaker: John Koenig
+  [287] "Clonie"
+           Speaker: Nellie McKay
+  [17846] The journey through loss and grief
+           Speaker: Jason B. Rosenthal
+  [944] The Happy Planet Index
+           Speaker: Nic Marks
+  [1546] How the Internet will (one day) transform government
+           Speaker: Clay Shirky
+  [5351] How to connect with depressed friends
+           Speaker: Bill Bernat
+  [3891] The secrets of spider venom
+           Speaker: Michel Dugon
+  [2758] The treadmill's dark and twisted past
+           Speaker: Conor Heffernan
+  [58015] 3 things new parents should consider before going back to work
+           Speaker: Emily Oster
+  [301] My year of living biblically
+           Speaker: A.J. Jacobs
+  [2734] How do you build a sacred space?
+           Speaker: Siamak Hariri
+  [2769] Behind the lies of Holocaust denial
+           Speaker: Deborah Lipstadt
+  [1935] Can the damaged brain repair itself?
+           Speaker: Siddharthan Chandran
+  [232] My wish: Find the next Einstein in Africa
+           Speaker: Neil Turok
+  [1164] Taking imagination seriously
+           Speaker: Janet Echelman
+  [218] The untouchable music of the theremin
+           Speaker: Pamelia Kurstin
+  [2645] How AI can bring on a second Industrial Revolution
+           Speaker: Kevin Kelly
+  [41105] Sleep is your superpower
+           Speaker: Matt Walker
+  [701] The hunt for a supermassive black hole
+           Speaker: Andrea Ghez
+  [1458] Beats that defy boxes
+           Speaker: Reggie Watts
+  [2032] Why we should trust scientists
+           Speaker: Naomi Oreskes
+  [771] Four ways to fix a broken legal system
+           Speaker: Philip K. Howard
+  [2577] The agony of trying to unsubscribe
+           Speaker: James Veitch
+  [623] Adjustable liquid-filled eyeglasses
+           Speaker: Joshua Silver
+  [2705] How I'm fighting bias in algorithms
+           Speaker: Joy Buolamwini
+  [1549] Design for people, not awards
+           Speaker: Timothy Prestero
+  [2659] Want kids to learn well? Feed them well
+           Speaker: Sam Kass
+  [30527] The story of a parent's transition and a son's redemption
+           Speaker: Paula Stone Williams
+  [16014] Why forgiveness is worth it
+           Speaker: Sarah Montana
+  [975] The best gift I ever survived
+           Speaker: Stacey Kramer
+  [534] Anti-gravity sculpture
+           Speaker: Tom Shannon
+  [2753] The benefits of a good night's sleep
+           Speaker: Shai Marcu
+  [2706] Why women should tell the stories of humanity
+           Speaker: Jude Kelly
+  [8419] You aren't at the mercy of your emotions -- your brain creates them
+           Speaker: Lisa Feldman Barrett
+  [1010] My green school dream
+           Speaker: John Hardy
+  [1826] How reliable is your memory?
+           Speaker: Elizabeth Loftus
+  [503] The Airstream, restyled
+           Speaker: Christopher C. Deam
+  [2606] Machine intelligence makes human morals more important
+           Speaker: Zeynep Tufekci
+  [21803] How we can use light to see deep inside our bodies and brains
+           Speaker: Mary Lou Jepsen
+  [310] Brain magic
+           Speaker: Keith Barry
+  [2677] What time is it on Mars?
+           Speaker: Nagin Cox
+  [286] The transformative power of classical music
+           Speaker: Benjamin Zander
+  [3366] A precise, three-word address for every place on earth
+           Speaker: Chris Sheldrick
+  [1096] A life lesson from a volunteer firefighter
+           Speaker: Mark Bezos
+  [2383] How new technology helps blind people explore the world
+           Speaker: Chieko Asakawa
+  [15537] A healthy economy should be designed to thrive, not grow
+           Speaker: Kate Raworth
+  [2537] Why you think you're right -- even if you're wrong
+           Speaker: Julia Galef
+  [2070] How to live passionately—no matter your age
+           Speaker: Isabel Allende
+  [24436] The myth behind the Chinese zodiac
+           Speaker: Megan Campisi
+  [1573] What we're learning from 5,000 brains
+           Speaker: Read Montague
+  [2245] Programming bacteria to detect cancer (and maybe treat it)
+           Speaker: Tal Danino
+  [52469] How you can use impostor syndrome to your benefit
+           Speaker: Mike Cannon-Brookes
+  [2186] Math is forever
+           Speaker: Eduardo Sáenz de Cabezón
+  [1782] Bluegrass virtuosity from ... New Jersey?
+           Speaker: Sleepy Man Banjo Boys
+  [1503] Meet your microbes
+           Speaker: Jonathan Eisen
+  [1282] The technology of storytelling
+           Speaker: Joe Sabia
+  [26263] Does time exist?
+           Speaker: Andrew Zimmerman
+  [971] Are mushrooms the new plastic?
+           Speaker: Eben Bayer
+  [20083] How to stop swiping and find your person on dating apps
+           Speaker: Christina Wallace
+  [24466] Why do we itch?
+           Speaker: Emma Bryce
+  [1261] The real reason for brains
+           Speaker: Daniel Wolpert
+  [414] The playful search for beauty
+           Speaker: Eva Zeisel
+  [2723] How to take a picture of a black hole
+           Speaker: Katie Bouman
+  [1506] The future race car -- 150mph, and no driver
+           Speaker: Chris Gerdes
+  [2511] Drawings that show the beauty and fragility of Earth
+           Speaker: Zaria Forman
+  [2377] Why are these 32 symbols found in ancient caves all over Europe?
+           Speaker: Genevieve von Petzinger
+  [44373] 4 questions you should always ask your doctor
+           Speaker: Christer Mjåset
+  [1703] How a dead duck changed my life
+           Speaker: Kees Moeliker
+  [23799] Situational irony: The opposite of what you think
+           Speaker: Christopher Warner
+  [2168] How to let altruism be your guide
+           Speaker: Matthieu Ricard
+  [1451] One year of turning the world inside out
+           Speaker: JR
+  [2868] The science of cells that never get old
+           Speaker: Elizabeth Blackburn
+  [362] The Web as a city
+           Speaker: Steven Johnson
+  [625] Post-crash, investing in a better world
+           Speaker: Geoff Mulgan
+  [2454] Simple hacks for life with Parkinson's
+           Speaker: Mileha Soneji
+  [2028] 3 ways to speak English
+           Speaker: Jamila Lyiscott
+  [891] Intricate beauty by design
+           Speaker: Marian Bantjes
+  [24167] How do dogs "see" with their noses?
+           Speaker: Alexandra Horowitz
+  [1698] We're covered in germs. Let's design for that.
+           Speaker: Jessica Green
+  [820] My seven species of robot -- and how we created them
+           Speaker: Dennis Hong
+================================================================================
+
+
+================================================================================
+EXAMPLE 1: Type 1: Fact Retrieval
+================================================================================
+
+Question: Find a TED talk about how your brain hallucinates reality. Provide the title and speaker.
+
+--------------------------------------------------------------------------------
+RETRIEVED CONTEXT:
+--------------------------------------------------------------------------------
+
+[1] Similarity: 0.5062
+    Talk ID: 2817
+    Title: Your brain hallucinates your conscious reality
+    Chunk: So you can now hear words there. Once more for luck. OK, so what's going on here? The remarkable thing is the sensory information coming into the brain hasn't changed at all. All that's changed is you...
+
+[2] Similarity: 0.4493
+    Talk ID: 2817
+    Title: Your brain hallucinates your conscious reality
+    Chunk: In the story I'm going to tell you, our conscious experiences of the world around us, and of ourselves within it, are kinds of controlled hallucinations that happen with, through and because of our li...
+
+[3] Similarity: 0.4490
+    Talk ID: 2817
+    Title: Your brain hallucinates your conscious reality
+    Chunk: Let's start with experiences of the world around us, and with the important idea of the brain as a prediction engine. Imagine being a brain. You're locked inside a bony skull, trying to figure what's ...
+
+[4] Similarity: 0.4193
+    Talk ID: 8419
+    Title: You aren't at the mercy of your emotions -- your brain creates them
+    Chunk: So what are emotions, really? Well, strap on your seat belt, because.. emotions are guesses. They are guesses that your brain constructs in the moment where billions of brain cells are working togethe...
+
+[5] Similarity: 0.4180
+    Talk ID: 2817
+    Title: Your brain hallucinates your conscious reality
+    Chunk: For most of us, the experience of being a person is so familiar, so unified and so continuous that it's difficult not to take it for granted. But we shouldn't take it for granted. There are in fact ma...
+
+[6] Similarity: 0.4167
+    Talk ID: 2817
+    Title: Your brain hallucinates your conscious reality
+    Chunk: Just over a year ago, for the third time in my life, I ceased to exist. I was having a small operation, and my brain was filling with anesthetic. I remember a sense of detachment and falling apart and...
+
+[7] Similarity: 0.4051
+    Talk ID: 1826
+    Title: How reliable is your memory?
+    Chunk: And when we feed them suggestive information that insinuates it's a different person, many of them misidentify their interrogator, often identifying someone who doesn't even remotely resemble the real...
+
+[8] Similarity: 0.4023
+    Talk ID: 310
+    Title: Brain magic
+    Chunk: Brain magic. What's brain magic all about? Brain magic to me indicates that area of magic dealing with psychological and mind-reading effects. So unlike traditional magic, it uses the power of words, ...
+
+[9] Similarity: 0.3894
+    Talk ID: 21803
+    Title: How we can use light to see deep inside our bodies and brains
+    Chunk: And then we can bring in marbles from below and have the hologram direct each marble to exactly the right position and angle, such as they emerge in a line at the top of the scatter matrix. We're goin...
+
+[10] Similarity: 0.3840
+    Talk ID: 1261
+    Title: The real reason for brains
+    Chunk: And moreover, it profoundly changes your perceptions by what you do. And to do that, I'll tell you about how the brain deals with sensory input. So you send a command out, you get sensory feedback bac...
+
+--------------------------------------------------------------------------------
+LLM RESPONSE:
+--------------------------------------------------------------------------------
+
+Title: Your brain hallucinates your conscious reality
+Speaker: Anil Seth
+
+Explanation (from the provided TED data): the talk's description and transcript explicitly frame perception as "controlled hallucinations" — e.g., the description says "we're all hallucinating all the time," and the transcript states, "In fact, we're all hallucinating all the time, including right now. It's just that when we agree about our hallucinations, we call that reality," and that our conscious experiences "are kinds of controlled hallucinations."
+
+
+================================================================================
+EXAMPLE 2: Type 2: Multi-Result Listing
+================================================================================
+
+Question: List 3 TED talks about technology and innovation.
+
+--------------------------------------------------------------------------------
+RETRIEVED CONTEXT:
+--------------------------------------------------------------------------------
+
+[1] Similarity: 0.4265
+    Talk ID: 820
+    Title: My seven species of robot -- and how we created them
+    Chunk: And I think, "Ah, this is cool." So right next to my bed I keep a notebook, a journal, with a special pen that has an LED light on it, because I don't want to turn on the light and wake up my wife. So...
+
+[2] Similarity: 0.4220
+    Talk ID: 625
+    Title: Post-crash, investing in a better world
+    Chunk: And he believed we live with others, we share the world with others and therefore our innovation must be done with others too, not doing things at people, for them, and so on. Now, what he did didn't ...
+
+[3] Similarity: 0.3938
+    Talk ID: 2645
+    Title: How AI can bring on a second Industrial Revolution
+    Chunk: I'm going to talk a little bit about where technology's going. And often technology comes to us, we're surprised by what it brings. But there's actually a large aspect of technology that's much more p...
+
+[4] Similarity: 0.3842
+    Talk ID: 757
+    Title: Solving social problems with a nudge
+    Chunk: Maybe the last mile problem really should be thought of as the last mile opportunity. Let's go back to diabetes. This is a typical insulin injection. Now, carrying this thing around is complicated. Yo...
+
+[5] Similarity: 0.3775
+    Talk ID: 1546
+    Title: How the Internet will (one day) transform government
+    Chunk: The thing that got Martha Payne's opinions out into the public was a piece of technology, but the thing that kept them there was political will. It was the expectation of the citizens that she would n...
+
+[6] Similarity: 0.3748
+    Talk ID: 625
+    Title: Post-crash, investing in a better world
+    Chunk: But we also know it's only through experiment that we'll discover exactly how to run a low carbon city, how to care for a much older population, how to deal with drug addiction and so on. And here's t...
+
+[7] Similarity: 0.3695
+    Talk ID: 2645
+    Title: How AI can bring on a second Industrial Revolution
+    Chunk: That is the formula, that's what we're going to be doing. And that is the way in which we're going to make this second Industrial Revolution. And by the way — right now, this minute, you can log on to...
+
+[8] Similarity: 0.3668
+    Talk ID: 233
+    Title: My wish: Once Upon a School
+    Chunk: in Pittsfield, Massachusetts; Ink Spot in Cincinnati; Youth Speaks, San Francisco, California, which inspired us; Studio St. Louis in St. Louis; Austin Bat Cave in Austin; Fighting Words in Dublin, Ir...
+
+[9] Similarity: 0.3606
+    Talk ID: 2383
+    Title: How new technology helps blind people explore the world
+    Chunk: You might think there are many things that I can't do because I cannot see. That's largely true. Actually, I just needed to have a bit of help to come up to the stage. But there is also a lot that I c...
+
+[10] Similarity: 0.3574
+    Talk ID: 2705
+    Title: How I'm fighting bias in algorithms
+    Chunk: In her book, "Weapons of Math Destruction," data scientist Cathy O'Neil talks about the rising new WMDs — widespread, mysterious and destructive algorithms that are increasingly being used to make dec...
+
+--------------------------------------------------------------------------------
+LLM RESPONSE:
+--------------------------------------------------------------------------------
+
+Here are three TED talks from the provided TED data that are about technology and innovation:
+
+1) "How AI can bring on a second Industrial Revolution" — Kevin Kelly  
+- Metadata/description notes this talk is about AI and innovation: topics include "AI, ... innovation, ... technology" and the description says Kelly explores trends in AI that will reshape the next 20 years. (talk_id=2645)
+
+2) "How new technology helps blind people explore the world" — Chieko Asakawa  
+- Metadata/description explicitly frames this as technology + invention/innovation: topics include "invention, innovation, ... technology" and the description asks, "How can technology help improve our quality of life?" (talk_id=2383)
+
+3) "My seven species of robot -- and how we created them" — Dennis Hong  
+- Metadata/description focuses on robotics and engineering: topics include "robots, ... technology" and the description invites you to "Meet seven all-terrain robots ... built by Dennis Hong's robotics team." (talk_id=820)
+
+I selected these three based on their titles, topics and descriptions in the provided TED dataset.
+
+
+================================================================================
+EXAMPLE 3: Type 3: Summary Extraction
+================================================================================
+
+Question: Find a TED talk about growing a forest in your backyard. Provide the title and a short summary of the key idea.
+
+--------------------------------------------------------------------------------
+RETRIEVED CONTEXT:
+--------------------------------------------------------------------------------
+
+[1] Similarity: 0.5671
+    Talk ID: 2546
+    Title: How to grow a forest in your backyard
+    Chunk: This is a man-made forest. It can spread over acres and acres of area, or it could fit in a small space — as small as your house garden. Age of this forest is just two years old. I have a forest in th...
+
+[2] Similarity: 0.5283
+    Talk ID: 2546
+    Title: How to grow a forest in your backyard
+    Chunk: Every time we work at a new place, we find that every single element needed to make a forest is available right around us. All we have to do is to bring these elements together and let nature take ove...
+
+[3] Similarity: 0.5081
+    Talk ID: 2546
+    Title: How to grow a forest in your backyard
+    Chunk: We collect the seeds and germinate saplings out of them. We make sure that trees belonging to the same layer are not planted next to each other, or they will fight for the same vertical space when the...
+
+[4] Similarity: 0.4558
+    Talk ID: 2546
+    Title: How to grow a forest in your backyard
+    Chunk: Once established, these forests are going to regenerate themselves again and again — probably forever. In a natural forest like this, no management is the best management. It's a tiny jungle party. Th...
+
+[5] Similarity: 0.3849
+    Talk ID: 971
+    Title: Are mushrooms the new plastic?
+    Chunk: And because these materials are so prolific, because they're found in so many places, there's one other place you'll find this material, styrene, which is made from benzene, a known carcinogen. You'll...
+
+[6] Similarity: 0.3801
+    Talk ID: 820
+    Title: My seven species of robot -- and how we created them
+    Chunk: And I think, "Ah, this is cool." So right next to my bed I keep a notebook, a journal, with a special pen that has an LED light on it, because I don't want to turn on the light and wake up my wife. So...
+
+[7] Similarity: 0.3779
+    Talk ID: 944
+    Title: The Happy Planet Index
+    Chunk: The fastest way out of a bad mood: step outside, go for a walk, turn the radio on and dance. Being active is great for our positive mood. The third one is take notice. How aware are you of things goin...
+
+[8] Similarity: 0.3699
+    Talk ID: 1010
+    Title: My green school dream
+    Chunk: So we basically turned the box into a bubble. And these kids know that painless climate control may not be part of their future. We pay the bill at the end of the month, but the people that are really...
+
+[9] Similarity: 0.3686
+    Talk ID: 1010
+    Title: My green school dream
+    Chunk: The mothers aren't quite convinced. We've done a lot of outrageous things in our lives, and we said, okay, local, what does "local" mean? Local means that 20 percent of the population of the school ha...
+
+[10] Similarity: 0.3684
+    Talk ID: 944
+    Title: The Happy Planet Index
+    Chunk: Human beings are very motivated by the "now." You put a smart meter in your home, and you see how much electricity you're using right now, how much it's costing you, your kids go around and turn the l...
+
+--------------------------------------------------------------------------------
+LLM RESPONSE:
+--------------------------------------------------------------------------------
+
+Title: How to grow a forest in your backyard — Shubhendu Sharma
+
+Short summary of the key idea (from the TED data):
+Shubhendu Sharma explains how to create ultra-dense, biodiverse mini-forests even in urban backyards by "engineering soil, microbes and biomass to kickstart natural growth processes" (talk description). His method starts with restoring soil (adding local biomass and microorganisms so the soil "becomes alive"), selecting native tree species and arranging them in layered mixes, planting saplings close together, mulching the surface and watering for the first 2–3 years. Roots and fungal networks establish underground, then the planted forest becomes self‑sustaining and regenerates itself — in his words you can "grow a 100-year-old forest in just 10 years" and even fit a forest "as small as your house garden" (transcript chunks).
+
+
+================================================================================
+EXAMPLE 4: Type 4: Recommendation
+================================================================================
+
+Question: Recommend a TED talk about the coming neurological epidemic.
+
+--------------------------------------------------------------------------------
+RETRIEVED CONTEXT:
+--------------------------------------------------------------------------------
+
+[1] Similarity: 0.5494
+    Talk ID: 408
+    Title: The coming neurological epidemic
+    Chunk: Unless we do something to prevent it, over the next 40 years we’re facing an epidemic of neurologic diseases on a global scale. A cheery thought. On this map, every country that’s colored blue has mor...
+
+[2] Similarity: 0.4917
+    Talk ID: 1935
+    Title: Can the damaged brain repair itself?
+    Chunk: I'm very pleased to be here today to talk to you all about how we might repair the damaged brain, and I'm particularly excited by this field, because as a neurologist myself, I believe that this offer...
+
+[3] Similarity: 0.4790
+    Talk ID: 21803
+    Title: How we can use light to see deep inside our bodies and brains
+    Chunk: We're working on a system that puts all three of these capabilities into the same system — neural read and write with light and sound, while simultaneously mapping oxygen use in the brain — all togeth...
+
+[4] Similarity: 0.4408
+    Talk ID: 1573
+    Title: What we're learning from 5,000 brains
+    Chunk: I won't go through the details of it, but that's an important discovery, and we know a good bit about that now, and it's just a small piece of it, but it's important because those are the neurons that...
+
+[5] Similarity: 0.4293
+    Talk ID: 1573
+    Title: What we're learning from 5,000 brains
+    Chunk: Take any cognitive domain you want, memory, motor planning, thinking about your mother-in-law, getting angry at people, emotional response, it goes on and on, put people into functional MRI devices, a...
+
+[6] Similarity: 0.4262
+    Talk ID: 21803
+    Title: How we can use light to see deep inside our bodies and brains
+    Chunk: In comparison to my pound of flesh, where you can see the light goes everywhere. So let's see that again, blood. This is really key: blood absorbs light, flesh scatters light. This is significant, bec...
+
+[7] Similarity: 0.4200
+    Talk ID: 1573
+    Title: What we're learning from 5,000 brains
+    Chunk: That is, we exploit the fact that the healthy partner, playing somebody with major depression, or playing somebody with autism spectrum disorder, or playing somebody with attention deficit hyperactivi...
+
+[8] Similarity: 0.4164
+    Talk ID: 1573
+    Title: What we're learning from 5,000 brains
+    Chunk: Other people. Everyone is interested in other people. Everyone has relationships with other people, and they're interested in these relationships for a variety of reasons. Good relationships, bad rela...
+
+[9] Similarity: 0.4026
+    Talk ID: 1935
+    Title: Can the damaged brain repair itself?
+    Chunk: But equally, each of these individual four cells alone or together, can go rogue or die, and when that happens, you get damage. You get damaged wiring. You get disrupted connections. And that's eviden...
+
+[10] Similarity: 0.4001
+    Talk ID: 408
+    Title: The coming neurological epidemic
+    Chunk: Most of the important and all of the creative work in this area is being funded by private philanthropies. And there’s tremendous scope for additional private help here, because the government has dro...
+
+--------------------------------------------------------------------------------
+LLM RESPONSE:
+--------------------------------------------------------------------------------
+
+Recommend: "The coming neurological epidemic" — Gregory Petsko (talk_id 408).
+
+Why: The talk directly addresses an impending global epidemic of neurological diseases as populations age. The talk’s metadata summarizes his case: “Biochemist Gregory Petsko makes a convincing argument that, in the next 50 years, we'll see an epidemic of neurological diseases, such as Alzheimer's… His solution: more research into the brain and its functions.” In the transcript Petsko opens with the warning: “Unless we do something to prevent it, over the next 40 years we’re facing an epidemic of neurologic diseases on a global scale.” He also discusses practical risk-reduction steps people can take (e.g., caffeine may reduce Parkinson’s risk; fish oil and blood-pressure control can lower Alzheimer’s risk) and calls for more research and funding.
+
+This talk is the best match in the provided TED data for the topic you asked about.
+

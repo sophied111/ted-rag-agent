@@ -1,6 +1,6 @@
 {
-  "scheme_id": "cs1536_ol10",
-  "chunk_size": 1536,
+  "scheme_id": "cs512_ol10",
+  "chunk_size": 512,
   "overlap_ratio": 0.1,
   "top_k": 10
 }
