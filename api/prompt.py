@@ -21,8 +21,8 @@ SYSTEM_PROMPT = (
     "and transcript passages). You must not use any external "
     "knowledge, the open internet, or information that is not explicitly "
     "contained in the retrieved context. If the answer cannot be "
-    "determined from the provided context, respond: "I don't know "
-    "based on the provided TED data." Always explain your answer "
+    "determined from the provided context, respond: 'I don't know' "
+    "based on the provided TED data. Always explain your answer "
     "using the given context, quoting or paraphrasing the relevant "
     "transcript or metadata when helpful."
 )
