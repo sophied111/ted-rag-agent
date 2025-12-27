@@ -143,21 +143,55 @@ def strip_weird_unicode(text: str) -> str:
 
 _WS = re.compile(r"\s+")
 
+
+
+
 def preprocess_text(text: str) -> str:
     """
     Canonical preprocessing before chunking.
+    Removes TED-specific artifacts and cleans text for better embedding quality.
+    
+    Args:
+        text: Raw transcript text
+        
+    Returns:
+        Cleaned text ready for chunking
     """
     if not text:
         return ""
 
-    # Optional but safe
+    # Optional but safe: normalize Unicode
     text = unicodedata.normalize("NFC", text)
 
     # Remove weird / invisible chars
     text = strip_weird_unicode(text)
+    
+    # Remove TED-specific artifacts (audience reactions, stage directions)
+    # Common patterns: (Laughter), (Applause), (Music), (Video), (Audio), etc.
+    text = re.sub(r'\([A-Z][a-z]+\)', '', text)  # Remove (Laughter), (Applause), etc.
+    text = re.sub(r'\([A-Z][a-z]+ [a-z]+\)', '', text)  # Remove (Laughter and applause)
+    
+    # Remove timestamps if present: [00:00] or [0:00:00]
+    text = re.sub(r'\[\d{1,2}:\d{2}(:\d{2})?\]', '', text)
+    
+    # Remove URLs
+    text = re.sub(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', '', text)
+    
+    # Remove email addresses
+    text = re.sub(r'\S+@\S+', '', text)
+    
+    # Remove excessive punctuation (3+ repeated chars)
+    text = re.sub(r'([.!?]){3,}', r'\1\1', text)
+    
+    # Remove standalone numbers that might be artifacts
+    text = re.sub(r'\b\d+\b(?!\s*[a-zA-Z])', '', text)
 
-    # Normalize whitespace
+    # Normalize whitespace (collapse multiple spaces, newlines, tabs)
     text = _WS.sub(" ", text).strip()
+    
+    # Remove extra spaces around punctuation
+    text = re.sub(r'\s+([,.!?;:])', r'\1', text)
+    text = re.sub(r'([,.!?;:])\s+', r'\1 ', text)
 
     return text
 
