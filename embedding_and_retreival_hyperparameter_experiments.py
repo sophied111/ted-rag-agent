@@ -198,10 +198,13 @@ def preprocess_text(text: str) -> str:
 
 def chunk_text(text: str, max_tokens: int, overlap_ratio: float) -> List[str]:
     """
-    Split text into overlapping chunks using token approximation.
+    Split text into overlapping chunks using token approximation with sentence boundary awareness.
     
     Uses a simple heuristic: ~4 characters ≈ 1 token. This is deterministic
     and dependency-free (no tiktoken required).
+    
+    Prioritizes sentence boundaries to avoid cutting sentences mid-way, falling back to
+    word-level chunking only when a single sentence exceeds max_tokens.
     
     Args:
         text: Input text to chunk
@@ -209,50 +212,95 @@ def chunk_text(text: str, max_tokens: int, overlap_ratio: float) -> List[str]:
         overlap_ratio: Fraction of overlap between consecutive chunks (0.0 to 0.3)
         
     Returns:
-        List of text chunks with specified overlap
+        List of text chunks with specified overlap, respecting sentence boundaries
     """
     text = preprocess_text(text)
 
     if not text:
         return []
 
-    words = text.split(" ")
-    # crude token estimate per word
-    word_tokens = [max(1, len(w) // 4) for w in words]
+    # Split into sentences first (using common sentence terminators)
+    # This regex handles: . ! ? followed by space or end of string
+    sentence_endings = re.compile(r'(?<=[.!?])\s+')
+    sentences = sentence_endings.split(text)
+    
+    # Calculate token estimate for each sentence
+    sentence_tokens = []
+    for sent in sentences:
+        words = sent.split(" ")
+        tokens = sum(max(1, len(w) // 4) for w in words)
+        sentence_tokens.append(tokens)
 
     chunks: List[str] = []
-    n = len(words)
-    start = 0
     overlap_tokens = int(max_tokens * overlap_ratio)
-
-    while start < n:
-        total = 0
-        end = start
-
-        while end < n and total + word_tokens[end] <= max_tokens:
-            total += word_tokens[end]
-            end += 1
-
-        if end == start:  # pathological case
-            end = min(n, start + 1)
-
-        chunk = " ".join(words[start:end]).strip()
+    
+    n = len(sentences)
+    start_idx = 0
+    
+    while start_idx < n:
+        current_tokens = 0
+        end_idx = start_idx
+        chunk_sentences = []
+        
+        # Greedily add sentences until we exceed max_tokens
+        while end_idx < n and current_tokens + sentence_tokens[end_idx] <= max_tokens:
+            chunk_sentences.append(sentences[end_idx])
+            current_tokens += sentence_tokens[end_idx]
+            end_idx += 1
+        
+        # If we couldn't fit even one sentence, split that sentence by words (fallback)
+        if end_idx == start_idx:
+            # Single sentence is too large, fall back to word-level chunking
+            words = sentences[start_idx].split(" ")
+            word_tokens = [max(1, len(w) // 4) for w in words]
+            
+            word_end = 0
+            word_tokens_sum = 0
+            while word_end < len(words) and word_tokens_sum + word_tokens[word_end] <= max_tokens:
+                word_tokens_sum += word_tokens[word_end]
+                word_end += 1
+            
+            if word_end == 0:  # Pathological case: single word too large
+                word_end = 1
+            
+            chunk = " ".join(words[:word_end]).strip()
+            if chunk:
+                chunks.append(chunk)
+            
+            # For overlap, go back by word count
+            back_words = 0
+            back_tokens = 0
+            i = word_end - 1
+            while i >= 0 and back_tokens < overlap_tokens:
+                back_tokens += word_tokens[i]
+                back_words += 1
+                i -= 1
+            
+            # Update sentence with remaining words
+            sentences[start_idx] = " ".join(words[max(1, word_end - back_words):])
+            sentence_tokens[start_idx] = sum(word_tokens[max(1, word_end - back_words):])
+            
+            if not sentences[start_idx].strip():
+                start_idx += 1
+            continue
+        
+        # Create chunk from complete sentences
+        chunk = " ".join(chunk_sentences).strip()
         if chunk:
             chunks.append(chunk)
-
-        if end >= n:
+        
+        if end_idx >= n:
             break
-
-        # step forward with overlap
-        back = 0
+        
+        # Calculate overlap: step back by overlap_tokens worth of sentences
+        back_idx = end_idx - 1
         back_tokens = 0
-        i = end - 1
-        while i >= start and back_tokens < overlap_tokens:
-            back_tokens += word_tokens[i]
-            back += 1
-            i -= 1
-
-        start = max(start + 1, end - back)
+        while back_idx >= start_idx and back_tokens < overlap_tokens:
+            back_tokens += sentence_tokens[back_idx]
+            back_idx -= 1
+        
+        # Start next chunk from overlap point
+        start_idx = max(start_idx + 1, back_idx + 1)
 
     return chunks
 
