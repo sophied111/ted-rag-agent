@@ -21,7 +21,7 @@ SYSTEM_PROMPT = (
     "and transcript passages). You must not use any external "
     "knowledge, the open internet, or information that is not explicitly "
     "contained in the retrieved context. If the answer cannot be "
-    "determined from the provided context, respond: 'I don't know' "
+    "determined from the provided context, respond: I don't know "
     "based on the provided TED data. Always explain your answer "
     "using the given context, quoting or paraphrasing the relevant "
     "transcript or metadata when helpful."
@@ -130,7 +130,7 @@ def build_prompt(question: str, matches) -> str:
     return (
         "Use ONLY the following TED dataset context (metadata + transcript passages). "
         "Answer the question. If the answer cannot be determined from this context, say: "
-        ""I don't know based on the provided TED data."\n\n"
+        "I don't know based on the provided TED data.\n\n"
         f"QUESTION:\n{question}\n\n"
         f"CONTEXT:\n{evidence}\n"
     )
