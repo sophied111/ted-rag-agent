@@ -23,11 +23,5 @@
       "src": "/(.*)",
       "dest": "/index.html"
     }
-  ],
-  "env": {
-    "OPENAI_API_KEY": "@openai_api_key",
-    "PINECONE_API_KEY": "@pinecone_api_key",
-    "PINECONE_INDEX": "@pinecone_index",
-    "EMBEDDING_API_KEY": "@embedding_api_key"
-  }
+  ]
 }
