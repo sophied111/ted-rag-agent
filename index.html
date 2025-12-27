@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TED Talk RAG Assistant</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+        
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .subtitle {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 100px;
+            transition: border-color 0.3s;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            width: 100%;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #667eea;
+        }
+        
+        .loading.active {
+            display: block;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .response-section {
+            display: none;
+        }
+        
+        .response-section.active {
+            display: block;
+        }
+        
+        .response-text {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            margin-bottom: 20px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+        
+        .context-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            border-left: 3px solid #764ba2;
+        }
+        
+        .context-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .context-chunk {
+            font-size: 0.9em;
+            color: #555;
+            line-height: 1.5;
+            margin-top: 8px;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .stat-item {
+            text-align: center;
+            flex: 1;
+            min-width: 120px;
+        }
+        
+        .stat-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .stat-value {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: #667eea;
+        }
+        
+        .error {
+            background: #fee;
+            border-left: 4px solid #f44336;
+            padding: 15px;
+            border-radius: 8px;
+            color: #c62828;
+            margin-top: 15px;
+        }
+        
+        .section-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .metadata {
+            font-size: 0.85em;
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎤 TED Talk RAG Assistant</h1>
+            <p class="subtitle">Ask questions about TED Talks using AI-powered retrieval</p>
+        </header>
+        
+        <div class="card">
+            <div class="input-group">
+                <label for="question">Your Question</label>
+                <textarea 
+                    id="question" 
+                    placeholder="Example: Find a TED talk about how your brain hallucinates reality. Provide the title and speaker."
+                ></textarea>
+            </div>
+            
+            <button id="submitBtn" onclick="submitQuestion()">Ask Question</button>
+            
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Searching TED Talks...</p>
+            </div>
+            
+            <div id="error"></div>
+        </div>
+        
+        <div class="response-section" id="responseSection">
+            <div class="card">
+                <div class="section-title">📝 Answer</div>
+                <div class="response-text" id="responseText"></div>
+            </div>
+            
+            <div class="card">
+                <div class="section-title">📚 Retrieved Context</div>
+                <div id="contextList"></div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="section-title">⚙️ Configuration</div>
+            <div class="stats" id="stats">
+                <div class="stat-item">
+                    <div class="stat-label">Chunk Size</div>
+                    <div class="stat-value" id="chunkSize">-</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Overlap Ratio</div>
+                    <div class="stat-value" id="overlapRatio">-</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Top-K</div>
+                    <div class="stat-value" id="topK">-</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Load stats on page load
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/stats');
+                const data = await response.json();
+                
+                document.getElementById('chunkSize').textContent = data.chunk_size;
+                document.getElementById('overlapRatio').textContent = data.overlap_ratio;
+                document.getElementById('topK').textContent = data.top_k;
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+        
+        async function submitQuestion() {
+            const question = document.getElementById('question').value.trim();
+            const errorDiv = document.getElementById('error');
+            const loading = document.getElementById('loading');
+            const submitBtn = document.getElementById('submitBtn');
+            const responseSection = document.getElementById('responseSection');
+            
+            // Clear previous results
+            errorDiv.innerHTML = '';
+            responseSection.classList.remove('active');
+            
+            if (!question) {
+                errorDiv.innerHTML = '<div class="error">Please enter a question</div>';
+                return;
+            }
+            
+            // Show loading
+            loading.classList.add('active');
+            submitBtn.disabled = true;
+            
+            try {
+                const response = await fetch('/api/prompt', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ question })
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || 'Request failed');
+                }
+                
+                // Display response
+                document.getElementById('responseText').textContent = data.response;
+                
+                // Display context
+                const contextList = document.getElementById('contextList');
+                contextList.innerHTML = '';
+                
+                if (data.context && data.context.length > 0) {
+                    data.context.forEach((ctx, index) => {
+                        const div = document.createElement('div');
+                        div.className = 'context-item';
+                        div.innerHTML = `
+                            <div class="context-title">[${index + 1}] ${ctx.title || 'Unknown Title'}</div>
+                            <div class="metadata">
+                                Talk ID: ${ctx.talk_id || 'N/A'} | 
+                                Similarity Score: ${(ctx.score || 0).toFixed(4)}
+                            </div>
+                            <div class="context-chunk">${(ctx.chunk || '').substring(0, 300)}${ctx.chunk && ctx.chunk.length > 300 ? '...' : ''}</div>
+                        `;
+                        contextList.appendChild(div);
+                    });
+                } else {
+                    contextList.innerHTML = '<p>No context retrieved</p>';
+                }
+                
+                // Show response section
+                responseSection.classList.add('active');
+                
+            } catch (error) {
+                errorDiv.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+            } finally {
+                loading.classList.remove('active');
+                submitBtn.disabled = false;
+            }
+        }
+        
+        // Allow Enter key to submit (Ctrl+Enter for multiline)
+        document.getElementById('question').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                submitQuestion();
+            }
+        });
+        
+        // Load stats on page load
+        loadStats();
+    </script>
+</body>
+</html>
