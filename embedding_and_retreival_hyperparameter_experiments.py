@@ -429,6 +429,82 @@ def query_index(index, namespace: str, embedding_client: OpenAI, question: str, 
     return res.matches
 
 
+def hybrid_query(index, scheme_id: str, embedding_client: OpenAI, question: str, top_k: int, metadata_weight: float = 0.6, content_weight: float = 0.4):
+    """
+    Hybrid search combining metadata and content embeddings with weighted fusion.
+    
+    Searches both metadata-only chunks (titles, descriptions) and transcript chunks,
+    then merges results using Reciprocal Rank Fusion (RRF) with configurable weights.
+    
+    This addresses the issue where relevant talks might be missed if the query
+    matches the title/description but not the transcript chunks.
+    
+    IMPORTANT: Respects top_k limit - queries each namespace with exactly top_k results,
+    ensuring compliance with MAX_TOP_K constraint.
+    
+    Args:
+        index: Pinecone index instance
+        scheme_id: Base scheme ID (e.g., 'cs1024_ol20')
+        embedding_client: OpenAI client for query embedding
+        question: User's natural language query
+        top_k: Number of final results to return (MUST NOT be exceeded)
+        metadata_weight: Weight for metadata results (default: 0.6, higher priority)
+        content_weight: Weight for content results (default: 0.4)
+        
+    Returns:
+        List of merged and re-ranked matches (exactly top_k or fewer)
+    """
+    # Search metadata namespace with top_k limit (do not exceed)
+    metadata_namespace = f"{scheme_id}_metadata"
+    try:
+        metadata_matches = query_index(index, metadata_namespace, embedding_client, question, top_k)
+    except Exception as e:
+        print(f"Warning: Could not query metadata namespace '{metadata_namespace}': {e}")
+        metadata_matches = []
+    
+    # Search content namespace with top_k limit (do not exceed)
+    content_matches = query_index(index, scheme_id, embedding_client, question, top_k)
+    
+    # Reciprocal Rank Fusion (RRF) with weights
+    k = 60
+    talk_scores = {}
+    
+    # Process metadata matches
+    for rank, match in enumerate(metadata_matches, start=1):
+        talk_id = match.metadata.get('talk_id') if match.metadata else None
+        if not talk_id:
+            continue
+        
+        rrf_score = metadata_weight / (k + rank)
+        combined_score = rrf_score + (float(match.score) * metadata_weight * 0.5)
+        
+        if talk_id not in talk_scores or combined_score > talk_scores[talk_id][0]:
+            talk_scores[talk_id] = (combined_score, match)
+    
+    # Process content matches
+    for rank, match in enumerate(content_matches, start=1):
+        talk_id = match.metadata.get('talk_id') if match.metadata else None
+        if not talk_id:
+            continue
+        
+        rrf_score = content_weight / (k + rank)
+        combined_score = rrf_score + (float(match.score) * content_weight * 0.5)
+        
+        if talk_id not in talk_scores:
+            talk_scores[talk_id] = (combined_score, match)
+        else:
+            existing_score, existing_match = talk_scores[talk_id]
+            new_score = existing_score + combined_score
+            better_match = match if match.metadata.get('chunk_type') != 'metadata' else existing_match
+            talk_scores[talk_id] = (new_score, better_match)
+    
+    # Sort by combined score and return top_k
+    sorted_matches = sorted(talk_scores.items(), key=lambda x: x[1][0], reverse=True)
+    final_matches = [match for _, (score, match) in sorted_matches[:top_k]]
+    
+    return final_matches
+
+
 # =============================
 # Chunk construction
 # =============================
@@ -572,6 +648,54 @@ def build_chunks_for_scheme(df: pd.DataFrame, scheme: ChunkScheme, store_chunk_t
     return out
 
 
+def build_metadata_chunks(df: pd.DataFrame, scheme: ChunkScheme) -> List[ChunkRecord]:
+    """
+    Build metadata-only chunks for hybrid retrieval.
+    Creates one chunk per talk containing title, description, topics, and speaker.
+    
+    These chunks are embedded separately and used for title/topic-based queries
+    that might not match well with transcript content.
+    
+    Args:
+        df: DataFrame with TED talks
+        scheme: Chunking configuration (for namespace identification)
+        
+    Returns:
+        List of ChunkRecord objects with metadata text
+    """
+    out: List[ChunkRecord] = []
+    for _, row in df.iterrows():
+        talk_id = str(row.get("talk_id", "")).strip()
+        title = str(row.get("title", "")).strip()
+        speaker = str(row.get("speaker_1", "")).strip()
+        topics = str(row.get("topics", "")).strip()
+        description = str(row.get("description", "")).strip()
+        
+        # Create rich metadata text for embedding
+        metadata_text = f"""{title}
+
+        Description: {description}
+
+        Topics: {topics}
+
+        Speaker: {speaker}"""
+        
+        chunk_id = f"{talk_id}:{scheme.scheme_id}:METADATA"
+        md = {
+            "talk_id": talk_id,
+            "title": title,
+            "speaker_1": speaker,
+            "topics": topics,
+            "description": description,
+            "chunk_index": -1,
+            "scheme_id": scheme.scheme_id,
+            "chunk_type": "metadata",
+            "chunk": metadata_text,
+        }
+        out.append(ChunkRecord(chunk_id=chunk_id, text=metadata_text, metadata=md))
+    return out
+
+
 # =============================
 # Evaluation (retrieval-only)
 # =============================
@@ -672,8 +796,9 @@ def evaluate_grid(index, embedding_client: OpenAI, df: pd.DataFrame, schemes: Li
                 
                 for i, eq in enumerate(eval_set, 1):
                     # Retrieval only - no LLM
+                    # Use hybrid search (metadata + content)
                     try:
-                        matches = query_index(index, scheme.scheme_id, embedding_client, eq.question, top_k)
+                        matches = hybrid_query(index, scheme.scheme_id, embedding_client, eq.question, top_k)
                         score = score_matches(matches, eq)
                         scores.append(score)
                         
@@ -747,7 +872,8 @@ def build_prompt(question: str, matches) -> str:
     )
 
 def rag_answer(embedding_client: OpenAI, chat_client: OpenAI, index, scheme_id: str, top_k: int, question: str) -> Dict:
-    matches = query_index(index, scheme_id, embedding_client, question, top_k)
+    # Use hybrid search for better retrieval (metadata + content)
+    matches = hybrid_query(index, scheme_id, embedding_client, question, top_k)
     user_prompt = build_prompt(question, matches)
 
     chat = chat_client.chat.completions.create(
@@ -784,6 +910,7 @@ def rag_answer(embedding_client: OpenAI, chat_client: OpenAI, index, scheme_id: 
 def build_and_upsert_all_schemes(index, embedding_client: OpenAI, df: pd.DataFrame, schemes: List[ChunkScheme], force_reembed: bool = False) -> None:
     """
     Build chunks for all schemes and upload to Pinecone.
+    Uses hybrid approach: creates both content chunks and metadata-only chunks.
     
     Args:
         index: Pinecone index instance
@@ -797,34 +924,64 @@ def build_and_upsert_all_schemes(index, embedding_client: OpenAI, df: pd.DataFra
         print(f"[{i}/{len(schemes)}] Processing scheme: {scheme.scheme_id}")
         
         # Check if namespace already has vectors (unless force_reembed is True)
+        metadata_namespace = f"{scheme.scheme_id}_metadata"
+        skip_content = False
+        skip_metadata = False
+        
         if not force_reembed:
             try:
                 stats = index.describe_index_stats()
                 namespace_stats = stats.get('namespaces', {})
+                
+                # Check content namespace
                 if scheme.scheme_id in namespace_stats and namespace_stats[scheme.scheme_id].get('vector_count', 0) > 0:
-                    print(f"  ⏭️  Namespace '{scheme.scheme_id}' already has {namespace_stats[scheme.scheme_id]['vector_count']} vectors, skipping")
+                    print(f"  ⏭️  Content namespace '{scheme.scheme_id}' already has {namespace_stats[scheme.scheme_id]['vector_count']} vectors")
+                    skip_content = True
+                
+                # Check metadata namespace
+                if metadata_namespace in namespace_stats and namespace_stats[metadata_namespace].get('vector_count', 0) > 0:
+                    print(f"  ⏭️  Metadata namespace '{metadata_namespace}' already has {namespace_stats[metadata_namespace]['vector_count']} vectors")
+                    skip_metadata = True
+                
+                if skip_content and skip_metadata:
                     print(f"     (Set FORCE_REEMBED=true to override)")
                     continue
+                    
             except Exception as e:
                 print(f"  Warning: Could not check namespace stats: {e}")
         else:
             print(f"  🔄 Force re-embedding enabled, will overwrite existing data")
-            # Delete all vectors in the namespace if it exists
+            # Delete all vectors in both namespaces if they exist
             try:
                 stats = index.describe_index_stats()
                 namespace_stats = stats.get('namespaces', {})
+                
+                # Delete content namespace
                 if scheme.scheme_id in namespace_stats and namespace_stats[scheme.scheme_id].get('vector_count', 0) > 0:
                     index.delete(delete_all=True, namespace=scheme.scheme_id)
-                    print(f"  🗑️  Deleted {namespace_stats[scheme.scheme_id]['vector_count']} existing vectors from namespace '{scheme.scheme_id}'")
-                else:
-                    print(f"  ℹ️  Namespace '{scheme.scheme_id}' is empty or doesn't exist yet")
+                    print(f"  🗑️  Deleted {namespace_stats[scheme.scheme_id]['vector_count']} existing vectors from content namespace '{scheme.scheme_id}'")
+                
+                # Delete metadata namespace
+                if metadata_namespace in namespace_stats and namespace_stats[metadata_namespace].get('vector_count', 0) > 0:
+                    index.delete(delete_all=True, namespace=metadata_namespace)
+                    print(f"  🗑️  Deleted {namespace_stats[metadata_namespace]['vector_count']} existing vectors from metadata namespace '{metadata_namespace}'")
+                    
             except Exception as e:
-                print(f"  Warning: Could not delete from namespace: {e}")
+                print(f"  Warning: Could not delete from namespaces: {e}")
         
-        chunks = build_chunks_for_scheme(df, scheme, store_chunk_text_in_metadata=True)
-        print(f"  Created {len(chunks)} chunks, uploading to Pinecone...")
-        upsert_chunks(index, scheme.scheme_id, embedding_client, chunks)
-        print(f"  ✓ Uploaded to namespace: {scheme.scheme_id}")
+        # Build and upload content chunks (transcript)
+        if not skip_content:
+            chunks = build_chunks_for_scheme(df, scheme, store_chunk_text_in_metadata=True)
+            print(f"  Created {len(chunks)} content chunks, uploading to Pinecone...")
+            upsert_chunks(index, scheme.scheme_id, embedding_client, chunks)
+            print(f"  ✓ Uploaded to content namespace: {scheme.scheme_id}")
+        
+        # Build and upload metadata chunks (title, description, topics)
+        if not skip_metadata:
+            metadata_chunks = build_metadata_chunks(df, scheme)
+            print(f"  Created {len(metadata_chunks)} metadata chunks, uploading to Pinecone...")
+            upsert_chunks(index, metadata_namespace, embedding_client, metadata_chunks)
+            print(f"  ✓ Uploaded to metadata namespace: {metadata_namespace}")
 
 def choose_best(results: List[Dict]) -> Dict:
     """
