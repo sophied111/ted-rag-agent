@@ -739,6 +739,7 @@ def build_and_upsert_all_schemes(index, embedding_client: OpenAI, df: pd.DataFra
             print(f"  🔄 Force re-embedding enabled, will overwrite existing data")
             # Delete all records within that namespace
             index.delete(delete_all=True, namespace=scheme.scheme_id)
+            print(f"All vectors in namespace '{scheme.scheme_id}' have been deleted.")
         
         chunks = build_chunks_for_scheme(df, scheme, store_chunk_text_in_metadata=True)
         print(f"  Created {len(chunks)} chunks, uploading to Pinecone...")
