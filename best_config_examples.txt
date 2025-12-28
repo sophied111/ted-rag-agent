@@ -228,52 +228,52 @@ Question: Find a TED talk about how your brain hallucinates reality. Provide the
 RETRIEVED CONTEXT:
 --------------------------------------------------------------------------------
 
-[1] Similarity: 0.5062
+[1] Pinecone Similarity: 0.5062
     Talk ID: 2817
     Title: Your brain hallucinates your conscious reality
     Chunk: So you can now hear words there. Once more for luck. OK, so what's going on here? The remarkable thing is the sensory information coming into the brain hasn't changed at all. All that's changed is you...
 
-[2] Similarity: 0.4493
+[2] Pinecone Similarity: 0.4493
     Talk ID: 2817
     Title: Your brain hallucinates your conscious reality
     Chunk: In the story I'm going to tell you, our conscious experiences of the world around us, and of ourselves within it, are kinds of controlled hallucinations that happen with, through and because of our li...
 
-[3] Similarity: 0.4490
+[3] Pinecone Similarity: 0.4490
     Talk ID: 2817
     Title: Your brain hallucinates your conscious reality
     Chunk: Let's start with experiences of the world around us, and with the important idea of the brain as a prediction engine. Imagine being a brain. You're locked inside a bony skull, trying to figure what's ...
 
-[4] Similarity: 0.4193
+[4] Pinecone Similarity: 0.4193
     Talk ID: 8419
     Title: You aren't at the mercy of your emotions -- your brain creates them
     Chunk: So what are emotions, really? Well, strap on your seat belt, because.. emotions are guesses. They are guesses that your brain constructs in the moment where billions of brain cells are working togethe...
 
-[5] Similarity: 0.4180
+[5] Pinecone Similarity: 0.4180
     Talk ID: 2817
     Title: Your brain hallucinates your conscious reality
     Chunk: For most of us, the experience of being a person is so familiar, so unified and so continuous that it's difficult not to take it for granted. But we shouldn't take it for granted. There are in fact ma...
 
-[6] Similarity: 0.4167
+[6] Pinecone Similarity: 0.4167
     Talk ID: 2817
     Title: Your brain hallucinates your conscious reality
     Chunk: Just over a year ago, for the third time in my life, I ceased to exist. I was having a small operation, and my brain was filling with anesthetic. I remember a sense of detachment and falling apart and...
 
-[7] Similarity: 0.4051
+[7] Pinecone Similarity: 0.4051
     Talk ID: 1826
     Title: How reliable is your memory?
     Chunk: And when we feed them suggestive information that insinuates it's a different person, many of them misidentify their interrogator, often identifying someone who doesn't even remotely resemble the real...
 
-[8] Similarity: 0.4023
+[8] Pinecone Similarity: 0.4023
     Talk ID: 310
     Title: Brain magic
     Chunk: Brain magic. What's brain magic all about? Brain magic to me indicates that area of magic dealing with psychological and mind-reading effects. So unlike traditional magic, it uses the power of words, ...
 
-[9] Similarity: 0.3894
+[9] Pinecone Similarity: 0.3894
     Talk ID: 21803
     Title: How we can use light to see deep inside our bodies and brains
     Chunk: And then we can bring in marbles from below and have the hologram direct each marble to exactly the right position and angle, such as they emerge in a line at the top of the scatter matrix. We're goin...
 
-[10] Similarity: 0.3840
+[10] Pinecone Similarity: 0.3840
     Talk ID: 1261
     Title: The real reason for brains
     Chunk: And moreover, it profoundly changes your perceptions by what you do. And to do that, I'll tell you about how the brain deals with sensory input. So you send a command out, you get sensory feedback bac...
@@ -285,7 +285,7 @@ LLM RESPONSE:
 Title: Your brain hallucinates your conscious reality
 Speaker: Anil Seth
 
-Explanation (from the provided TED data): the talk's description and transcript explicitly frame perception as "controlled hallucinations" — e.g., the description says "we're all hallucinating all the time," and the transcript states, "In fact, we're all hallucinating all the time, including right now. It's just that when we agree about our hallucinations, we call that reality," and that our conscious experiences "are kinds of controlled hallucinations."
+This is supported by the provided TED metadata and description: "title=Your brain hallucinates your conscious reality | speaker=Anil Seth" and the talk description and transcript passages stating "we're all hallucinating all the time; when we agree about our hallucinations, we call it 'reality.'"
 
 
 ================================================================================
@@ -298,52 +298,52 @@ Question: List 3 TED talks about technology and innovation.
 RETRIEVED CONTEXT:
 --------------------------------------------------------------------------------
 
-[1] Similarity: 0.4265
+[1] Pinecone Similarity: 0.4265
     Talk ID: 820
     Title: My seven species of robot -- and how we created them
     Chunk: And I think, "Ah, this is cool." So right next to my bed I keep a notebook, a journal, with a special pen that has an LED light on it, because I don't want to turn on the light and wake up my wife. So...
 
-[2] Similarity: 0.4220
+[2] Pinecone Similarity: 0.4220
     Talk ID: 625
     Title: Post-crash, investing in a better world
     Chunk: And he believed we live with others, we share the world with others and therefore our innovation must be done with others too, not doing things at people, for them, and so on. Now, what he did didn't ...
 
-[3] Similarity: 0.3938
+[3] Pinecone Similarity: 0.3937
     Talk ID: 2645
     Title: How AI can bring on a second Industrial Revolution
     Chunk: I'm going to talk a little bit about where technology's going. And often technology comes to us, we're surprised by what it brings. But there's actually a large aspect of technology that's much more p...
 
-[4] Similarity: 0.3842
+[4] Pinecone Similarity: 0.3842
     Talk ID: 757
     Title: Solving social problems with a nudge
     Chunk: Maybe the last mile problem really should be thought of as the last mile opportunity. Let's go back to diabetes. This is a typical insulin injection. Now, carrying this thing around is complicated. Yo...
 
-[5] Similarity: 0.3775
+[5] Pinecone Similarity: 0.3775
     Talk ID: 1546
     Title: How the Internet will (one day) transform government
     Chunk: The thing that got Martha Payne's opinions out into the public was a piece of technology, but the thing that kept them there was political will. It was the expectation of the citizens that she would n...
 
-[6] Similarity: 0.3748
+[6] Pinecone Similarity: 0.3748
     Talk ID: 625
     Title: Post-crash, investing in a better world
     Chunk: But we also know it's only through experiment that we'll discover exactly how to run a low carbon city, how to care for a much older population, how to deal with drug addiction and so on. And here's t...
 
-[7] Similarity: 0.3695
+[7] Pinecone Similarity: 0.3695
     Talk ID: 2645
     Title: How AI can bring on a second Industrial Revolution
     Chunk: That is the formula, that's what we're going to be doing. And that is the way in which we're going to make this second Industrial Revolution. And by the way — right now, this minute, you can log on to...
 
-[8] Similarity: 0.3668
+[8] Pinecone Similarity: 0.3668
     Talk ID: 233
     Title: My wish: Once Upon a School
     Chunk: in Pittsfield, Massachusetts; Ink Spot in Cincinnati; Youth Speaks, San Francisco, California, which inspired us; Studio St. Louis in St. Louis; Austin Bat Cave in Austin; Fighting Words in Dublin, Ir...
 
-[9] Similarity: 0.3606
+[9] Pinecone Similarity: 0.3606
     Talk ID: 2383
     Title: How new technology helps blind people explore the world
     Chunk: You might think there are many things that I can't do because I cannot see. That's largely true. Actually, I just needed to have a bit of help to come up to the stage. But there is also a lot that I c...
 
-[10] Similarity: 0.3574
+[10] Pinecone Similarity: 0.3574
     Talk ID: 2705
     Title: How I'm fighting bias in algorithms
     Chunk: In her book, "Weapons of Math Destruction," data scientist Cathy O'Neil talks about the rising new WMDs — widespread, mysterious and destructive algorithms that are increasingly being used to make dec...
@@ -352,18 +352,18 @@ RETRIEVED CONTEXT:
 LLM RESPONSE:
 --------------------------------------------------------------------------------
 
-Here are three TED talks from the provided TED data that are about technology and innovation:
+Here are three talks from the provided TED dataset about technology and innovation:
 
-1) "How AI can bring on a second Industrial Revolution" — Kevin Kelly  
-- Metadata/description notes this talk is about AI and innovation: topics include "AI, ... innovation, ... technology" and the description says Kelly explores trends in AI that will reshape the next 20 years. (talk_id=2645)
+1) "My seven species of robot — and how we created them" — Dennis Hong  
+   - Metadata/description: "Meet seven all-terrain robots -- like the humanoid, soccer-playing DARwIn and the cliff-gripping CLIMBeR -- built by Dennis Hong's robotics team..." (topics include 'robots', 'technology', 'engineering').
 
-2) "How new technology helps blind people explore the world" — Chieko Asakawa  
-- Metadata/description explicitly frames this as technology + invention/innovation: topics include "invention, innovation, ... technology" and the description asks, "How can technology help improve our quality of life?" (talk_id=2383)
+2) "How AI can bring on a second Industrial Revolution" — Kevin Kelly  
+   - Metadata/description: '"The actual path of a raindrop as it goes down the valley is unpredictable, but the general direction is inevitable," says digital visionary Kevin Kelly...' (topics include 'AI', 'innovation', 'technology').
 
-3) "My seven species of robot -- and how we created them" — Dennis Hong  
-- Metadata/description focuses on robotics and engineering: topics include "robots, ... technology" and the description invites you to "Meet seven all-terrain robots ... built by Dennis Hong's robotics team." (talk_id=820)
+3) "How new technology helps blind people explore the world" — Chieko Asakawa  
+   - Metadata/description: "How can technology help improve our quality of life? How can we navigate the world without using the sense of vision? Inventor and IBM Fellow Chieko Asakawa... is working on answering these questions." (topics include 'invention', 'innovation', 'technology').
 
-I selected these three based on their titles, topics and descriptions in the provided TED dataset.
+I selected these directly from the provided TED metadata and descriptions.
 
 
 ================================================================================
@@ -376,52 +376,52 @@ Question: Find a TED talk about growing a forest in your backyard. Provide the t
 RETRIEVED CONTEXT:
 --------------------------------------------------------------------------------
 
-[1] Similarity: 0.5671
+[1] Pinecone Similarity: 0.5671
     Talk ID: 2546
     Title: How to grow a forest in your backyard
     Chunk: This is a man-made forest. It can spread over acres and acres of area, or it could fit in a small space — as small as your house garden. Age of this forest is just two years old. I have a forest in th...
 
-[2] Similarity: 0.5283
+[2] Pinecone Similarity: 0.5283
     Talk ID: 2546
     Title: How to grow a forest in your backyard
     Chunk: Every time we work at a new place, we find that every single element needed to make a forest is available right around us. All we have to do is to bring these elements together and let nature take ove...
 
-[3] Similarity: 0.5081
+[3] Pinecone Similarity: 0.5081
     Talk ID: 2546
     Title: How to grow a forest in your backyard
     Chunk: We collect the seeds and germinate saplings out of them. We make sure that trees belonging to the same layer are not planted next to each other, or they will fight for the same vertical space when the...
 
-[4] Similarity: 0.4558
+[4] Pinecone Similarity: 0.4558
     Talk ID: 2546
     Title: How to grow a forest in your backyard
     Chunk: Once established, these forests are going to regenerate themselves again and again — probably forever. In a natural forest like this, no management is the best management. It's a tiny jungle party. Th...
 
-[5] Similarity: 0.3849
+[5] Pinecone Similarity: 0.3849
     Talk ID: 971
     Title: Are mushrooms the new plastic?
     Chunk: And because these materials are so prolific, because they're found in so many places, there's one other place you'll find this material, styrene, which is made from benzene, a known carcinogen. You'll...
 
-[6] Similarity: 0.3801
+[6] Pinecone Similarity: 0.3800
     Talk ID: 820
     Title: My seven species of robot -- and how we created them
     Chunk: And I think, "Ah, this is cool." So right next to my bed I keep a notebook, a journal, with a special pen that has an LED light on it, because I don't want to turn on the light and wake up my wife. So...
 
-[7] Similarity: 0.3779
+[7] Pinecone Similarity: 0.3781
     Talk ID: 944
     Title: The Happy Planet Index
     Chunk: The fastest way out of a bad mood: step outside, go for a walk, turn the radio on and dance. Being active is great for our positive mood. The third one is take notice. How aware are you of things goin...
 
-[8] Similarity: 0.3699
+[8] Pinecone Similarity: 0.3699
     Talk ID: 1010
     Title: My green school dream
     Chunk: So we basically turned the box into a bubble. And these kids know that painless climate control may not be part of their future. We pay the bill at the end of the month, but the people that are really...
 
-[9] Similarity: 0.3686
+[9] Pinecone Similarity: 0.3686
     Talk ID: 1010
     Title: My green school dream
     Chunk: The mothers aren't quite convinced. We've done a lot of outrageous things in our lives, and we said, okay, local, what does "local" mean? Local means that 20 percent of the population of the school ha...
 
-[10] Similarity: 0.3684
+[10] Pinecone Similarity: 0.3684
     Talk ID: 944
     Title: The Happy Planet Index
     Chunk: Human beings are very motivated by the "now." You put a smart meter in your home, and you see how much electricity you're using right now, how much it's costing you, your kids go around and turn the l...
@@ -430,10 +430,9 @@ RETRIEVED CONTEXT:
 LLM RESPONSE:
 --------------------------------------------------------------------------------
 
-Title: How to grow a forest in your backyard — Shubhendu Sharma
+Title: How to grow a forest in your backyard (Shubhendu Sharma)
 
-Short summary of the key idea (from the TED data):
-Shubhendu Sharma explains how to create ultra-dense, biodiverse mini-forests even in urban backyards by "engineering soil, microbes and biomass to kickstart natural growth processes" (talk description). His method starts with restoring soil (adding local biomass and microorganisms so the soil "becomes alive"), selecting native tree species and arranging them in layered mixes, planting saplings close together, mulching the surface and watering for the first 2–3 years. Roots and fungal networks establish underground, then the planted forest becomes self‑sustaining and regenerates itself — in his words you can "grow a 100-year-old forest in just 10 years" and even fit a forest "as small as your house garden" (transcript chunks).
+Short summary of the key idea: Sharma explains how to create ultra-dense, biodiverse mini-forests—even in small urban yards—by engineering local soil, adding biomass and microbes to kickstart natural nutrient cycles, and planting native species in layered, closely spaced mixes. He describes practical steps (improving soil porosity with local biomass, inoculating soil with microorganisms, germinating native seeds, planting trees in shrub/sub‑tree/tree/canopy layers, mulching and watering for 2–3 years) so that the forest becomes self‑sustaining and “regenerates itself again and again.” The talk promises you can “grow a 100‑year‑old forest in just 10 years” and calls it a “tiny jungle party.” (Source: TED talk description and transcript excerpts from Shubhendu Sharma’s talk.)
 
 
 ================================================================================
@@ -446,52 +445,52 @@ Question: Recommend a TED talk about the coming neurological epidemic.
 RETRIEVED CONTEXT:
 --------------------------------------------------------------------------------
 
-[1] Similarity: 0.5494
+[1] Pinecone Similarity: 0.5494
     Talk ID: 408
     Title: The coming neurological epidemic
     Chunk: Unless we do something to prevent it, over the next 40 years we’re facing an epidemic of neurologic diseases on a global scale. A cheery thought. On this map, every country that’s colored blue has mor...
 
-[2] Similarity: 0.4917
+[2] Pinecone Similarity: 0.4917
     Talk ID: 1935
     Title: Can the damaged brain repair itself?
     Chunk: I'm very pleased to be here today to talk to you all about how we might repair the damaged brain, and I'm particularly excited by this field, because as a neurologist myself, I believe that this offer...
 
-[3] Similarity: 0.4790
+[3] Pinecone Similarity: 0.4790
     Talk ID: 21803
     Title: How we can use light to see deep inside our bodies and brains
     Chunk: We're working on a system that puts all three of these capabilities into the same system — neural read and write with light and sound, while simultaneously mapping oxygen use in the brain — all togeth...
 
-[4] Similarity: 0.4408
+[4] Pinecone Similarity: 0.4408
     Talk ID: 1573
     Title: What we're learning from 5,000 brains
     Chunk: I won't go through the details of it, but that's an important discovery, and we know a good bit about that now, and it's just a small piece of it, but it's important because those are the neurons that...
 
-[5] Similarity: 0.4293
+[5] Pinecone Similarity: 0.4293
     Talk ID: 1573
     Title: What we're learning from 5,000 brains
     Chunk: Take any cognitive domain you want, memory, motor planning, thinking about your mother-in-law, getting angry at people, emotional response, it goes on and on, put people into functional MRI devices, a...
 
-[6] Similarity: 0.4262
+[6] Pinecone Similarity: 0.4262
     Talk ID: 21803
     Title: How we can use light to see deep inside our bodies and brains
     Chunk: In comparison to my pound of flesh, where you can see the light goes everywhere. So let's see that again, blood. This is really key: blood absorbs light, flesh scatters light. This is significant, bec...
 
-[7] Similarity: 0.4200
+[7] Pinecone Similarity: 0.4200
     Talk ID: 1573
     Title: What we're learning from 5,000 brains
     Chunk: That is, we exploit the fact that the healthy partner, playing somebody with major depression, or playing somebody with autism spectrum disorder, or playing somebody with attention deficit hyperactivi...
 
-[8] Similarity: 0.4164
+[8] Pinecone Similarity: 0.4164
     Talk ID: 1573
     Title: What we're learning from 5,000 brains
     Chunk: Other people. Everyone is interested in other people. Everyone has relationships with other people, and they're interested in these relationships for a variety of reasons. Good relationships, bad rela...
 
-[9] Similarity: 0.4026
+[9] Pinecone Similarity: 0.4030
     Talk ID: 1935
     Title: Can the damaged brain repair itself?
     Chunk: But equally, each of these individual four cells alone or together, can go rogue or die, and when that happens, you get damage. You get damaged wiring. You get disrupted connections. And that's eviden...
 
-[10] Similarity: 0.4001
+[10] Pinecone Similarity: 0.4001
     Talk ID: 408
     Title: The coming neurological epidemic
     Chunk: Most of the important and all of the creative work in this area is being funded by private philanthropies. And there’s tremendous scope for additional private help here, because the government has dro...
@@ -500,9 +499,13 @@ RETRIEVED CONTEXT:
 LLM RESPONSE:
 --------------------------------------------------------------------------------
 
-Recommend: "The coming neurological epidemic" — Gregory Petsko (talk_id 408).
+I recommend Gregory Petsko’s TED Talk "The coming neurological epidemic" (talk_id 408). The talk is explicitly about this topic: as the metadata puts it, "Biochemist Gregory Petsko makes a convincing argument that, in the next 50 years, we'll see an epidemic of neurological diseases, such as Alzheimer's, as the world population ages." 
 
-Why: The talk directly addresses an impending global epidemic of neurological diseases as populations age. The talk’s metadata summarizes his case: “Biochemist Gregory Petsko makes a convincing argument that, in the next 50 years, we'll see an epidemic of neurological diseases, such as Alzheimer's… His solution: more research into the brain and its functions.” In the transcript Petsko opens with the warning: “Unless we do something to prevent it, over the next 40 years we’re facing an epidemic of neurologic diseases on a global scale.” He also discusses practical risk-reduction steps people can take (e.g., caffeine may reduce Parkinson’s risk; fish oil and blood-pressure control can lower Alzheimer’s risk) and calls for more research and funding.
+Why this is the right recommendation (from the provided transcript):
+- Petsko frames the problem clearly: "Unless we do something to prevent it, over the next 40 years we’re facing an epidemic of neurologic diseases on a global scale." (transcript)
+- He explains biological mechanisms and possible research directions — for example, "Alzheimer’s disease starts when a protein that should be folded up properly misfolds... one approach we’re taking is to try to design drugs that function like molecular Scotch tape, to hold the protein into its proper shape." (transcript)
+- He discusses funding and policy issues: "Most of the important and all of the creative work in this area is being funded by private philanthropies... the government has dropped the ball on much of this." (transcript)
+- He also gives practical individual tips: caffeine may lower Parkinson’s risk, avoid head injuries, fish oil may reduce Alzheimer’s risk, "keep your blood pressure down," and "use it or lose it" for cognition. (transcript)
 
-This talk is the best match in the provided TED data for the topic you asked about.
+If you want a talk that outlines the scope of the looming neurological epidemic, explains mechanisms and research directions, and offers both policy and personal takeaways, Petsko’s talk is the one to watch.
 
