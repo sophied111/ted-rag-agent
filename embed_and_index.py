@@ -233,7 +233,6 @@ def load_talks(csv_path: str, sample_n: int = None) -> pd.DataFrame:
     if missing_cols:
         raise ValueError(f"Missing required columns: {missing_cols}")
     
-    df = df.dropna(subset=REQUIRED_COLS)
     df = df.sort_values('talk_id').reset_index(drop=True)
     
     if sample_n and sample_n < len(df):

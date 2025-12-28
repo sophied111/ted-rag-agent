@@ -543,10 +543,8 @@ def load_sample_talks(csv_path: str, sample_n: int, seed: int) -> pd.DataFrame:
     if missing_cols:
         raise ValueError(f"Missing required columns: {missing_cols}")
     
-    df = df.dropna(subset=REQUIRED_COLS)
-    
     # CRITICAL: Sort by talk_id to ensure consistent ordering across runs
-    # This ensures DataFrame iteration order is deterministic even if CSV or dropna() changes
+    # This ensures DataFrame iteration order is deterministic even if CSV changes
     df = df.sort_values('talk_id').reset_index(drop=True)
     
     # Set random seed for reproducibility
