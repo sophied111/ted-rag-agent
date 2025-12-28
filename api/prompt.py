@@ -157,14 +157,11 @@ def rag_answer(question: str) -> Dict:
     pc = Pinecone(api_key=pinecone_api_key)
     index = pc.Index(pinecone_index_name)
     
-    # Retrieve relevant chunks using hybrid search
-    matches = hybrid_query(index, scheme_id, embedding_client, question, top_k)
-    
-    # Extract match objects from tuples
-    match_objects = [m[1] if isinstance(m, tuple) else m for m in matches]
+    # Retrieve relevant chunks using simple vector similarity search
+    matches = query_index(index, scheme_id, embedding_client, question, top_k)
     
     # Build prompt
-    user_prompt = build_prompt(question, match_objects)
+    user_prompt = build_prompt(question, matches)
     
     # Generate answer
     chat = chat_client.chat.completions.create(
@@ -177,13 +174,7 @@ def rag_answer(question: str) -> Dict:
     
     # Format context for response
     context = []
-    for match_item in matches:
-        if isinstance(match_item, tuple):
-            combined_score, m = match_item
-        else:
-            combined_score = None
-            m = match_item
-        
+    for m in matches:
         md = m.metadata or {}
         context.append({
             "talk_id": md.get("talk_id"),

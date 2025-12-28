@@ -768,11 +768,8 @@ def score_matches(matches, eq: EvalQuery) -> float:
     if not matches:
         return 0.0
 
-    # Handle both tuple format (combined_score, match) and plain match objects
-    match_objects = [m[1] if isinstance(m, tuple) else m for m in matches]
-
     if eq.expected_talk_id:
-        return 1.0 if any(str((m.metadata or {}).get("talk_id")) == str(eq.expected_talk_id) for m in match_objects) else 0.0
+        return 1.0 if any(str((m.metadata or {}).get("talk_id")) == str(eq.expected_talk_id) for m in matches) else 0.0
 
     if eq.expected_keywords:
         blob = " ".join(
@@ -787,14 +784,14 @@ def score_matches(matches, eq: EvalQuery) -> float:
                     ]
                 )
             ).lower()
-            for m in match_objects
+            for m in matches
         )
         kws = [k.lower() for k in eq.expected_keywords]
         hit = sum(1 for k in kws if k in blob)
         return hit / max(1, len(kws))
 
     # fallback: mean similarity score (relative comparisons only)
-    return sum(float(m.score) for m in match_objects) / len(match_objects)
+    return sum(float(m.score) for m in matches) / len(matches)
 
 def evaluate_grid(index, embedding_client: OpenAI, df: pd.DataFrame, schemes: List[ChunkScheme], topk_grid: List[int], eval_set: List[EvalQuery]) -> List[Dict]:
     """
@@ -848,9 +845,9 @@ def evaluate_grid(index, embedding_client: OpenAI, df: pd.DataFrame, schemes: Li
                 
                 for i, eq in enumerate(eval_set, 1):
                     # Retrieval only - no LLM
-                    # Use hybrid search (metadata + content)
+                    # Use simple vector similarity search on content chunks
                     try:
-                        matches = hybrid_query(index, scheme.scheme_id, embedding_client, eq.question, top_k)
+                        matches = query_index(index, scheme.scheme_id, embedding_client, eq.question, top_k)
                         score = score_matches(matches, eq)
                         scores.append(score)
                         
@@ -936,11 +933,9 @@ def build_prompt(question: str, matches) -> str:
     )
 
 def rag_answer(embedding_client: OpenAI, chat_client: OpenAI, index, scheme_id: str, top_k: int, question: str) -> Dict:
-    # Use hybrid search for better retrieval (metadata + content)
-    matches = hybrid_query(index, scheme_id, embedding_client, question, top_k)
-    # Extract match objects from tuples for prompt building
-    match_objects = [m[1] if isinstance(m, tuple) else m for m in matches]
-    user_prompt = build_prompt(question, match_objects)
+    # Use simple vector similarity search on content chunks
+    matches = query_index(index, scheme_id, embedding_client, question, top_k)
+    user_prompt = build_prompt(question, matches)
 
     chat = chat_client.chat.completions.create(
         model=CHAT_MODEL,
@@ -998,9 +993,7 @@ def build_and_upsert_all_schemes(index, embedding_client: OpenAI, df: pd.DataFra
         print(f"[{i}/{len(schemes)}] Processing scheme: {scheme.scheme_id}")
         
         # Check if namespace already has vectors (unless force_reembed is True)
-        metadata_namespace = f"{scheme.scheme_id}_metadata"
         skip_content = False
-        skip_metadata = False
         
         if not force_reembed:
             try:
@@ -1009,23 +1002,16 @@ def build_and_upsert_all_schemes(index, embedding_client: OpenAI, df: pd.DataFra
                 
                 # Check content namespace
                 if scheme.scheme_id in namespace_stats and namespace_stats[scheme.scheme_id].get('vector_count', 0) > 0:
-                    print(f"  ⏭️  Content namespace '{scheme.scheme_id}' already has {namespace_stats[scheme.scheme_id]['vector_count']} vectors")
-                    skip_content = True
-                
-                # Check metadata namespace
-                if metadata_namespace in namespace_stats and namespace_stats[metadata_namespace].get('vector_count', 0) > 0:
-                    print(f"  ⏭️  Metadata namespace '{metadata_namespace}' already has {namespace_stats[metadata_namespace]['vector_count']} vectors")
-                    skip_metadata = True
-                
-                if skip_content and skip_metadata:
+                    print(f"  ⏭️  Namespace '{scheme.scheme_id}' already has {namespace_stats[scheme.scheme_id]['vector_count']} vectors")
                     print(f"     (Set FORCE_REEMBED=true to override)")
+                    skip_content = True
                     continue
                     
             except Exception as e:
                 print(f"  Warning: Could not check namespace stats: {e}")
         else:
             print(f"  🔄 Force re-embedding enabled, will overwrite existing data")
-            # Delete all vectors in both namespaces if they exist
+            # Delete all vectors in namespace if it exists
             try:
                 stats = index.describe_index_stats()
                 namespace_stats = stats.get('namespaces', {})
@@ -1033,29 +1019,17 @@ def build_and_upsert_all_schemes(index, embedding_client: OpenAI, df: pd.DataFra
                 # Delete content namespace
                 if scheme.scheme_id in namespace_stats and namespace_stats[scheme.scheme_id].get('vector_count', 0) > 0:
                     index.delete(delete_all=True, namespace=scheme.scheme_id)
-                    print(f"  🗑️  Deleted {namespace_stats[scheme.scheme_id]['vector_count']} existing vectors from content namespace '{scheme.scheme_id}'")
-                
-                # Delete metadata namespace
-                if metadata_namespace in namespace_stats and namespace_stats[metadata_namespace].get('vector_count', 0) > 0:
-                    index.delete(delete_all=True, namespace=metadata_namespace)
-                    print(f"  🗑️  Deleted {namespace_stats[metadata_namespace]['vector_count']} existing vectors from metadata namespace '{metadata_namespace}'")
+                    print(f"  🗑️  Deleted {namespace_stats[scheme.scheme_id]['vector_count']} existing vectors from namespace '{scheme.scheme_id}'")
                     
             except Exception as e:
-                print(f"  Warning: Could not delete from namespaces: {e}")
+                print(f"  Warning: Could not delete from namespace: {e}")
         
-        # Build and upload content chunks (transcript)
+        # Build and upload content chunks (transcript only)
         if not skip_content:
             chunks = build_chunks_for_scheme(df, scheme, store_chunk_text_in_metadata=True)
-            print(f"  Created {len(chunks)} content chunks, uploading to Pinecone...")
+            print(f"  Created {len(chunks)} chunks, uploading to Pinecone...")
             upsert_chunks(index, scheme.scheme_id, embedding_client, chunks)
-            print(f"  ✓ Uploaded to content namespace: {scheme.scheme_id}")
-        
-        # Build and upload metadata chunks (title, description, topics)
-        if not skip_metadata:
-            metadata_chunks = build_metadata_chunks(df, scheme)
-            print(f"  Created {len(metadata_chunks)} metadata chunks, uploading to Pinecone...")
-            upsert_chunks(index, metadata_namespace, embedding_client, metadata_chunks)
-            print(f"  ✓ Uploaded to metadata namespace: {metadata_namespace}")
+            print(f"  ✓ Uploaded to namespace: {scheme.scheme_id}")
 
 def choose_best(results: List[Dict]) -> Dict:
     """
@@ -1142,14 +1116,14 @@ def main():
     # Strategic chunking schemes: 6 combinations balancing cost and coverage
     # Testing chunk sizes: 512, 1024, 1536 with overlaps: 0.1 (low), 0.2 (medium), 0.25 (high)
     schemes = [
-        # ChunkScheme("cs512_ol10", 512, 0.10),           # Small baseline
+        ChunkScheme("cs512_ol10", 512, 0.10),           # Small baseline
         ChunkScheme("cs512_ol20", 512, 0.20),           # Small baseline 2
         ChunkScheme("cs512_ol30", 512, 0.30),           # Small baseline 3
-        # ChunkScheme("cs1024_ol10", 1024, 0.10),         # Medium, low overlap
-        # ChunkScheme("cs1024_ol20", 1024, 0.20),         # Medium baseline
-        # ChunkScheme("cs1024_ol25", 1024, 0.25),         # Medium, high overlap
-        # ChunkScheme("cs1536_ol10", 1536, 0.10),         # Large, low overlap
-        # ChunkScheme("cs1536_ol20", 1536, 0.20),         # Large baseline
+        ChunkScheme("cs1024_ol10", 1024, 0.10),         # Medium, low overlap
+        ChunkScheme("cs1024_ol20", 1024, 0.20),         # Medium baseline
+        ChunkScheme("cs1024_ol25", 1024, 0.25),         # Medium, high overlap
+        ChunkScheme("cs1536_ol10", 1536, 0.10),         # Large, low overlap
+        ChunkScheme("cs1536_ol20", 1536, 0.20),         # Large baseline
     ]
     
     # Top-k grid: 4 values × 6 schemes = 24 total configurations
