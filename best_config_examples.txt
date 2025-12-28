@@ -282,10 +282,10 @@ RETRIEVED CONTEXT:
 LLM RESPONSE:
 --------------------------------------------------------------------------------
 
-Title: Your brain hallucinates your conscious reality
+Title: "Your brain hallucinates your conscious reality"
 Speaker: Anil Seth
 
-This is supported by the provided TED metadata and description: "title=Your brain hallucinates your conscious reality | speaker=Anil Seth" and the talk description and transcript passages stating "we're all hallucinating all the time; when we agree about our hallucinations, we call it 'reality.'"
+This matches the provided TED metadata (talk_id=2817). In the transcript Seth states, "we're all hallucinating all the time; when we agree about our hallucinations, we call that 'reality,'" and explains that "the world we experience comes as much, if not more, from the inside out as from the outside in," showing the talk is about how the brain hallucinates reality.
 
 
 ================================================================================
@@ -352,18 +352,11 @@ RETRIEVED CONTEXT:
 LLM RESPONSE:
 --------------------------------------------------------------------------------
 
-Here are three talks from the provided TED dataset about technology and innovation:
+- "How AI can bring on a second Industrial Revolution" — Kevin Kelly. Metadata lists topics including "AI" and "innovation" and the description frames technology trends and "making things smarter and smarter." As the talk says, "The actual path of a raindrop ... the general direction is inevitable," and Kelly explores AI's role in a coming industrial shift. (talk_id=2645)
 
-1) "My seven species of robot — and how we created them" — Dennis Hong  
-   - Metadata/description: "Meet seven all-terrain robots -- like the humanoid, soccer-playing DARwIn and the cliff-gripping CLIMBeR -- built by Dennis Hong's robotics team..." (topics include 'robots', 'technology', 'engineering').
+- "My seven species of robot -- and how we created them" — Dennis Hong. Metadata tags include "robots" and "technology"; the description invites you to "Meet seven all-terrain robots" built by his lab and promises creative secrets of their development. (talk_id=820)
 
-2) "How AI can bring on a second Industrial Revolution" — Kevin Kelly  
-   - Metadata/description: '"The actual path of a raindrop as it goes down the valley is unpredictable, but the general direction is inevitable," says digital visionary Kevin Kelly...' (topics include 'AI', 'innovation', 'technology').
-
-3) "How new technology helps blind people explore the world" — Chieko Asakawa  
-   - Metadata/description: "How can technology help improve our quality of life? How can we navigate the world without using the sense of vision? Inventor and IBM Fellow Chieko Asakawa... is working on answering these questions." (topics include 'invention', 'innovation', 'technology').
-
-I selected these directly from the provided TED metadata and descriptions.
+- "How new technology helps blind people explore the world" — Chieko Asakawa. Metadata topics include "innovation" and "technology." In the transcript she recounts inventing "digital Braille editor, digital Braille dictionary and a digital Braille library network," showing technology-driven innovation for accessibility. (talk_id=2383)
 
 
 ================================================================================
@@ -401,7 +394,7 @@ RETRIEVED CONTEXT:
     Title: Are mushrooms the new plastic?
     Chunk: And because these materials are so prolific, because they're found in so many places, there's one other place you'll find this material, styrene, which is made from benzene, a known carcinogen. You'll...
 
-[6] Pinecone Similarity: 0.3800
+[6] Pinecone Similarity: 0.3801
     Talk ID: 820
     Title: My seven species of robot -- and how we created them
     Chunk: And I think, "Ah, this is cool." So right next to my bed I keep a notebook, a journal, with a special pen that has an LED light on it, because I don't want to turn on the light and wake up my wife. So...
@@ -416,7 +409,7 @@ RETRIEVED CONTEXT:
     Title: My green school dream
     Chunk: So we basically turned the box into a bubble. And these kids know that painless climate control may not be part of their future. We pay the bill at the end of the month, but the people that are really...
 
-[9] Pinecone Similarity: 0.3686
+[9] Pinecone Similarity: 0.3688
     Talk ID: 1010
     Title: My green school dream
     Chunk: The mothers aren't quite convinced. We've done a lot of outrageous things in our lives, and we said, okay, local, what does "local" mean? Local means that 20 percent of the population of the school ha...
@@ -430,9 +423,10 @@ RETRIEVED CONTEXT:
 LLM RESPONSE:
 --------------------------------------------------------------------------------
 
-Title: How to grow a forest in your backyard (Shubhendu Sharma)
+Title: "How to grow a forest in your backyard" — Shubhendu Sharma
 
-Short summary of the key idea: Sharma explains how to create ultra-dense, biodiverse mini-forests—even in small urban yards—by engineering local soil, adding biomass and microbes to kickstart natural nutrient cycles, and planting native species in layered, closely spaced mixes. He describes practical steps (improving soil porosity with local biomass, inoculating soil with microorganisms, germinating native seeds, planting trees in shrub/sub‑tree/tree/canopy layers, mulching and watering for 2–3 years) so that the forest becomes self‑sustaining and “regenerates itself again and again.” The talk promises you can “grow a 100‑year‑old forest in just 10 years” and calls it a “tiny jungle party.” (Source: TED talk description and transcript excerpts from Shubhendu Sharma’s talk.)
+Short summary of the key idea (from the provided TED data):
+Shubhendu Sharma shows how to create ultra‑dense, biodiverse mini‑forests even in cities or a home garden by working with natural processes. As the description puts it, he grows these “ultra‑dense, biodiverse mini‑forests of native species in urban areas by engineering soil, microbes and biomass to kickstart natural growth processes” and even explains how to grow “a 100‑year‑old forest in just 10 years.” In the talk he describes practical steps: improve local soil by mixing in biomass (peat, bagasse) so water can penetrate and be held; “add microorganisms to the soil” so they “produce the nutrients… the soil starts breathing again. It becomes alive”; choose native species from historical sources and plant them in four vertical layers, densely and close together; mulch the surface and water for the first 2–3 years, then let the established root, fungal and microbial networks allow the forest to regenerate itself. These steps turn a small urban plot into a self‑sustaining “tiny jungle party.”
 
 
 ================================================================================
@@ -499,13 +493,7 @@ RETRIEVED CONTEXT:
 LLM RESPONSE:
 --------------------------------------------------------------------------------
 
-I recommend Gregory Petsko’s TED Talk "The coming neurological epidemic" (talk_id 408). The talk is explicitly about this topic: as the metadata puts it, "Biochemist Gregory Petsko makes a convincing argument that, in the next 50 years, we'll see an epidemic of neurological diseases, such as Alzheimer's, as the world population ages." 
+Recommend: "The coming neurological epidemic" — Gregory Petsko (talk_id 408).
 
-Why this is the right recommendation (from the provided transcript):
-- Petsko frames the problem clearly: "Unless we do something to prevent it, over the next 40 years we’re facing an epidemic of neurologic diseases on a global scale." (transcript)
-- He explains biological mechanisms and possible research directions — for example, "Alzheimer’s disease starts when a protein that should be folded up properly misfolds... one approach we’re taking is to try to design drugs that function like molecular Scotch tape, to hold the protein into its proper shape." (transcript)
-- He discusses funding and policy issues: "Most of the important and all of the creative work in this area is being funded by private philanthropies... the government has dropped the ball on much of this." (transcript)
-- He also gives practical individual tips: caffeine may lower Parkinson’s risk, avoid head injuries, fish oil may reduce Alzheimer’s risk, "keep your blood pressure down," and "use it or lose it" for cognition. (transcript)
-
-If you want a talk that outlines the scope of the looming neurological epidemic, explains mechanisms and research directions, and offers both policy and personal takeaways, Petsko’s talk is the one to watch.
+Why: The talk’s description states Petsko "makes a convincing argument that, in the next 50 years, we'll see an epidemic of neurological diseases... as the world population ages." In the transcript he warns, "Unless we do something to prevent it, over the next 40 years we’re facing an epidemic of neurologic diseases on a global scale," explains why aging raises risks (Alzheimer’s, Parkinson’s), outlines scientific approaches (e.g., drugs that act like "molecular Scotch tape" to stop protein misfolding), and offers practical takeaways and calls for more brain research and private philanthropy.
 
