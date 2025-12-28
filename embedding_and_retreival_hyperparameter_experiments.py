@@ -1142,12 +1142,14 @@ def main():
     # Strategic chunking schemes: 6 combinations balancing cost and coverage
     # Testing chunk sizes: 512, 1024, 1536 with overlaps: 0.1 (low), 0.2 (medium), 0.25 (high)
     schemes = [
-        ChunkScheme("cs512_ol10", 512, 0.10),           # Small baseline
-        ChunkScheme("cs1024_ol10", 1024, 0.10),         # Medium, low overlap
-        ChunkScheme("cs1024_ol20", 1024, 0.20),         # Medium baseline
-        ChunkScheme("cs1024_ol25", 1024, 0.25),         # Medium, high overlap
-        ChunkScheme("cs1536_ol10", 1536, 0.10),         # Large, low overlap
-        ChunkScheme("cs1536_ol20", 1536, 0.20),         # Large baseline
+        # ChunkScheme("cs512_ol10", 512, 0.10),           # Small baseline
+        ChunkScheme("cs512_ol20", 512, 0.20),           # Small baseline 2
+        ChunkScheme("cs512_ol30", 512, 0.30),           # Small baseline 3
+        # ChunkScheme("cs1024_ol10", 1024, 0.10),         # Medium, low overlap
+        # ChunkScheme("cs1024_ol20", 1024, 0.20),         # Medium baseline
+        # ChunkScheme("cs1024_ol25", 1024, 0.25),         # Medium, high overlap
+        # ChunkScheme("cs1536_ol10", 1536, 0.10),         # Large, low overlap
+        # ChunkScheme("cs1536_ol20", 1536, 0.20),         # Large baseline
     ]
     
     # Top-k grid: 4 values × 6 schemes = 24 total configurations
