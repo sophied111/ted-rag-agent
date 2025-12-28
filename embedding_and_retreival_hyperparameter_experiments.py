@@ -510,7 +510,12 @@ def hybrid_query(index, scheme_id: str, embedding_client: OpenAI, question: str,
 # Chunk construction
 # =============================
 
-REQUIRED_COLS = ["talk_id", "title", "transcript"]
+REQUIRED_COLS = [
+    "talk_id", "title", "transcript", "speaker_1", "all_speakers",
+    "occupations", "about_speakers", "views", "recorded_date", "published_date",
+    "event", "native_lang", "available_lang", "duration", "topics",
+    "related_talks", "description"
+]
 
 def load_sample_talks(csv_path: str, sample_n: int, seed: int) -> pd.DataFrame:
     """
@@ -1119,11 +1124,11 @@ def main():
         ChunkScheme("cs512_ol10", 512, 0.10),           # Small baseline
         ChunkScheme("cs512_ol20", 512, 0.20),           # Small baseline 2
         ChunkScheme("cs512_ol30", 512, 0.30),           # Small baseline 3
-        ChunkScheme("cs1024_ol10", 1024, 0.10),         # Medium, low overlap
-        ChunkScheme("cs1024_ol20", 1024, 0.20),         # Medium baseline
-        ChunkScheme("cs1024_ol25", 1024, 0.25),         # Medium, high overlap
-        ChunkScheme("cs1536_ol10", 1536, 0.10),         # Large, low overlap
-        ChunkScheme("cs1536_ol20", 1536, 0.20),         # Large baseline
+        # ChunkScheme("cs1024_ol10", 1024, 0.10),         # Medium, low overlap
+        # ChunkScheme("cs1024_ol20", 1024, 0.20),         # Medium baseline
+        # ChunkScheme("cs1024_ol25", 1024, 0.25),         # Medium, high overlap
+        # ChunkScheme("cs1536_ol10", 1536, 0.10),         # Large, low overlap
+        # ChunkScheme("cs1536_ol20", 1536, 0.20),         # Large baseline
     ]
     
     # Top-k grid: 4 values × 6 schemes = 24 total configurations
