@@ -511,10 +511,7 @@ def hybrid_query(index, scheme_id: str, embedding_client: OpenAI, question: str,
 # =============================
 
 REQUIRED_COLS = [
-    "talk_id", "title", "transcript", "speaker_1", "all_speakers",
-    "occupations", "about_speakers", "views", "recorded_date", "published_date",
-    "event", "native_lang", "available_lang", "duration", "topics",
-    "related_talks", "description"
+    "talk_id", "title", "transcript", "speaker_1", "all_speakers", "topics", "description"
 ]
 
 def load_sample_talks(csv_path: str, sample_n: int, seed: int) -> pd.DataFrame:
@@ -636,18 +633,8 @@ def build_chunks_for_scheme(df: pd.DataFrame, scheme: ChunkScheme, store_chunk_t
         description = str(row.get("description", "")).strip()
         transcript = str(row.get("transcript", "")).strip()
         
-        # Additional metadata fields for fact retrieval
+        # Additional metadata field
         all_speakers = str(row.get("all_speakers", "")).strip()
-        occupations = str(row.get("occupations", "")).strip()
-        about_speakers = str(row.get("about_speakers", "")).strip()
-        views = str(row.get("views", "")).strip()
-        recorded_date = str(row.get("recorded_date", "")).strip()
-        published_date = str(row.get("published_date", "")).strip()
-        event = str(row.get("event", "")).strip()
-        native_lang = str(row.get("native_lang", "")).strip()
-        available_lang = str(row.get("available_lang", "")).strip()
-        duration = str(row.get("duration", "")).strip()
-        related_talks = str(row.get("related_talks", "")).strip()
 
         chunks = chunk_text(transcript, max_tokens=scheme.chunk_tokens, overlap_ratio=scheme.overlap_ratio)
         for i, ch in enumerate(chunks):
@@ -661,16 +648,6 @@ def build_chunks_for_scheme(df: pd.DataFrame, scheme: ChunkScheme, store_chunk_t
                 "chunk_index": i,
                 "scheme_id": scheme.scheme_id,
                 "all_speakers": all_speakers,
-                "occupations": occupations,
-                "about_speakers": about_speakers,
-                "views": views,
-                "recorded_date": recorded_date,
-                "published_date": published_date,
-                "event": event,
-                "native_lang": native_lang,
-                "available_lang": available_lang,
-                "duration": duration,
-                "related_talks": related_talks,
             }
             if store_chunk_text_in_metadata:
                 md["chunk"] = ch
