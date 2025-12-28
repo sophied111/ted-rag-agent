@@ -495,7 +495,7 @@ def hybrid_query(index, scheme_id: str, embedding_client: OpenAI, question: str,
         else:
             existing_score, existing_match = talk_scores[talk_id]
             new_score = existing_score + combined_score
-            better_match = match if match.metadata.get('chunk_type') != 'metadata' else existing_match
+            better_match = match if float(match.score) > float(existing_match.score) else existing_match
             talk_scores[talk_id] = (new_score, better_match)
     
     # Sort by combined score and return top_k with both scores
