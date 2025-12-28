@@ -307,66 +307,6 @@ def build_chunks_for_scheme(df: pd.DataFrame, scheme: ChunkScheme,
     return out
 
 
-def build_metadata_chunks(df: pd.DataFrame, scheme: ChunkScheme) -> List[ChunkRecord]:
-    """Build metadata-only chunks for hybrid retrieval."""
-    out: List[ChunkRecord] = []
-    
-    for _, row in df.iterrows():
-        talk_id = str(row.get("talk_id", "")).strip()
-        title = str(row.get("title", "")).strip()
-        speaker = str(row.get("speaker_1", "")).strip()
-        topics = str(row.get("topics", "")).strip()
-        description = str(row.get("description", "")).strip()
-        
-        # Additional metadata fields
-        all_speakers = str(row.get("all_speakers", "")).strip()
-        occupations = str(row.get("occupations", "")).strip()
-        about_speakers = str(row.get("about_speakers", "")).strip()
-        views = str(row.get("views", "")).strip()
-        recorded_date = str(row.get("recorded_date", "")).strip()
-        published_date = str(row.get("published_date", "")).strip()
-        event = str(row.get("event", "")).strip()
-        native_lang = str(row.get("native_lang", "")).strip()
-        available_lang = str(row.get("available_lang", "")).strip()
-        duration = str(row.get("duration", "")).strip()
-        related_talks = str(row.get("related_talks", "")).strip()
-        
-        metadata_text = f"""{title}
-
-        Description: {description}
-
-        Topics: {topics}
-
-        Speaker: {speaker}"""
-        
-        chunk_id = f"{talk_id}:{scheme.scheme_id}:METADATA"
-        md = {
-            "talk_id": talk_id,
-            "title": title,
-            "speaker_1": speaker,
-            "topics": topics,
-            "description": description,
-            "chunk_index": -1,
-            "scheme_id": scheme.scheme_id,
-            "chunk_type": "metadata",
-            "chunk": metadata_text,
-            "all_speakers": all_speakers,
-            "occupations": occupations,
-            "about_speakers": about_speakers,
-            "views": views,
-            "recorded_date": recorded_date,
-            "published_date": published_date,
-            "event": event,
-            "native_lang": native_lang,
-            "available_lang": available_lang,
-            "duration": duration,
-            "related_talks": related_talks,
-        }
-        out.append(ChunkRecord(chunk_id=chunk_id, text=metadata_text, metadata=md))
-    
-    return out
-
-
 # =============================
 # Embedding & Pinecone Upload
 # =============================
@@ -421,9 +361,7 @@ def build_and_upsert_schemes(index, embedding_client: OpenAI, df: pd.DataFrame,
     for i, scheme in enumerate(schemes, 1):
         print(f"\n[{i}/{len(schemes)}] Processing scheme: {scheme.scheme_id}")
         
-        metadata_namespace = f"{scheme.scheme_id}_metadata"
         skip_content = False
-        skip_metadata = False
         
         if not force_reembed:
             try:
@@ -431,15 +369,9 @@ def build_and_upsert_schemes(index, embedding_client: OpenAI, df: pd.DataFrame,
                 namespace_stats = stats.get('namespaces', {})
                 
                 if scheme.scheme_id in namespace_stats and namespace_stats[scheme.scheme_id].get('vector_count', 0) > 0:
-                    print(f"  ⏭️  Content namespace '{scheme.scheme_id}' already has {namespace_stats[scheme.scheme_id]['vector_count']} vectors")
-                    skip_content = True
-                
-                if metadata_namespace in namespace_stats and namespace_stats[metadata_namespace].get('vector_count', 0) > 0:
-                    print(f"  ⏭️  Metadata namespace '{metadata_namespace}' already has {namespace_stats[metadata_namespace]['vector_count']} vectors")
-                    skip_metadata = True
-                
-                if skip_content and skip_metadata:
+                    print(f"  ⏭️  Namespace '{scheme.scheme_id}' already has {namespace_stats[scheme.scheme_id]['vector_count']} vectors")
                     print(f"     (Set FORCE_REEMBED=true to override)")
+                    skip_content = True
                     continue
             except Exception as e:
                 print(f"  Warning: Could not check namespace stats: {e}")
@@ -452,26 +384,15 @@ def build_and_upsert_schemes(index, embedding_client: OpenAI, df: pd.DataFrame,
                 if scheme.scheme_id in namespace_stats and namespace_stats[scheme.scheme_id].get('vector_count', 0) > 0:
                     index.delete(delete_all=True, namespace=scheme.scheme_id)
                     print(f"  🗑️  Deleted {namespace_stats[scheme.scheme_id]['vector_count']} existing vectors from '{scheme.scheme_id}'")
-                
-                if metadata_namespace in namespace_stats and namespace_stats[metadata_namespace].get('vector_count', 0) > 0:
-                    index.delete(delete_all=True, namespace=metadata_namespace)
-                    print(f"  🗑️  Deleted {namespace_stats[metadata_namespace]['vector_count']} existing vectors from '{metadata_namespace}'")
             except Exception as e:
-                print(f"  Warning: Could not delete from namespaces: {e}")
+                print(f"  Warning: Could not delete from namespace: {e}")
         
-        # Build and upload content chunks
+        # Build and upload content chunks (transcript with metadata)
         if not skip_content:
             chunks = build_chunks_for_scheme(df, scheme, store_chunk_text_in_metadata=True)
-            print(f"  Created {len(chunks)} content chunks, uploading to Pinecone...")
+            print(f"  Created {len(chunks)} chunks, uploading to Pinecone...")
             upsert_chunks(index, scheme.scheme_id, embedding_client, chunks)
-            print(f"  ✓ Uploaded to content namespace: {scheme.scheme_id}")
-        
-        # Build and upload metadata chunks
-        if not skip_metadata:
-            metadata_chunks = build_metadata_chunks(df, scheme)
-            print(f"  Created {len(metadata_chunks)} metadata chunks, uploading to Pinecone...")
-            upsert_chunks(index, metadata_namespace, embedding_client, metadata_chunks)
-            print(f"  ✓ Uploaded to metadata namespace: {metadata_namespace}")
+            print(f"  ✓ Uploaded to namespace: {scheme.scheme_id}")
 
 
 # =============================
@@ -564,7 +485,7 @@ def main():
     print(f"{'=' * 60}")
     print(f"\nProcessed scheme: {scheme.scheme_id}")
     print(f"Total talks embedded: {len(df)}")
-    print(f"Namespaces created: {scheme.scheme_id}, {scheme.scheme_id}_metadata")
+    print(f"Namespace: {scheme.scheme_id}")
 
 
 if __name__ == "__main__":
